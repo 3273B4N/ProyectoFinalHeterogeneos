@@ -1,0 +1,7 @@
+build/
+examples/snake/build/
+examples/snake/neat_backup.txtbuild/
+examples/snake/build/
+.deps-cache/
+libneat.a
+lib/libneat.a
