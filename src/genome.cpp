@@ -247,6 +247,10 @@ int Genome::isValidNewConnection(int inNodeId, int outNodeId, bool areRecurrentC
 			if (connections[i].enabled) {
 				return 0;	// it is already a connection enabled
 			} else {
+				// Fix: if the disabled connection would now point backwards (input layer
+				// higher than output layer), don't re-enable it, since it would close a
+				// cycle in a non-recurrent network.
+				if (nodes[inNodeId].layer > nodes[outNodeId].layer && !connections[i].isRecurrent) return 0;
 				return 2;	// it is a former connection
 			}
 		}
@@ -294,7 +298,11 @@ bool Genome::addNode(std::vector<std::vector<int>>* innovIds, int* lastInnovId, 
 			
 			// update layers
 			nodes[newNodeId].layer = nodes[connections[iConn].inNodeId].layer + 1;	// update newNodeId layer
-			nodes[connections[iConn].outNodeId].layer = nodes[newNodeId].layer + 1;	// update outNodeId layer
+			// Fix: the layer used to be assigned directly, which could lower it if the node
+			// was already in a deeper layer. Now it is only updated when needed.
+			if (nodes[connections[iConn].outNodeId].layer <= nodes[newNodeId].layer) {
+				nodes[connections[iConn].outNodeId].layer = nodes[newNodeId].layer + 1;	// update outNodeId layer
+			}
 			updateLayersRec(connections[iConn].outNodeId);	// recursively update layers
 			
 			// output nodes can have different nodes after updating layers: let's give output nodes the same output layer, the maximum one
@@ -337,8 +345,14 @@ void Genome::updateLayersRec(int nodeId) {
 	for (int iConn = 0; iConn < (int) connections.size(); iConn++) {
 		if (!connections[iConn].isRecurrent && connections[iConn].enabled && connections[iConn].inNodeId == nodeId) {
 			int newNodeId = connections[iConn].outNodeId;
-			nodes[newNodeId].layer = nodes[nodeId].layer + 1;
-			updateLayersRec(newNodeId);
+			// Fix: the original code always did layer = parent + 1. If the node had another,
+			// deeper parent, its layer went down and some connections ended up pointing
+			// backwards. That could create cycles and cause infinite recursion (segfault).
+			// Now the layer can only increase, never decrease.
+			if (nodes[newNodeId].layer <= nodes[nodeId].layer) {
+				nodes[newNodeId].layer = nodes[nodeId].layer + 1;
+				updateLayersRec(newNodeId);
+			}
 		}
 	}
 }
@@ -353,7 +367,7 @@ void Genome::drawNetwork(sf::Vector2u windowSize, float dotsRadius) {
     
     // ### NODES ###
 	sf::Font font;
-	if (!font.loadFromFile("/usr/share/fonts/TTF/DejaVuSans.ttf")) {
+	if (!font.loadFromFile("/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf")) {
 		std::cout << "Error while loading font in 'Genome::drawNetwork'." << std::endl;
 	}
 
