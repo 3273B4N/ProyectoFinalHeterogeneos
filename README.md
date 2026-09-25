@@ -16,29 +16,6 @@ A skeleton project can be found in [/examples/template/](https://github.com/tito
 
 [resources_snakeNEAT.webm](https://user-images.githubusercontent.com/120715525/233745593-d2044124-56b4-4479-91bd-f73eb2f2e5ab.webm)
 
-## Modifications
-
-While testing the Snake example, the program occasionally crashed with a
-segmentation fault after several hundred generations. As the author notes above,
-this repository is no longer maintained, so the bug was fixed locally in
-`src/genome.cpp`.
-
-Cause: when updating node layers after a mutation, `updateLayersRec` always
-set `layer = parent + 1`. If a node had another, deeper parent, its layer could
-decrease, leaving connections pointing backwards. This could form cycles in a
-non-recurrent network, making `updateLayersRec` recurse indefinitely until the
-stack overflowed. Since mutations are random, the crash did not happen on every run.
-
-Fix: layers can now only increase, and a disabled connection is not
-re-enabled if it would point backwards. The changes are marked with `// Fix:`
-comments in `src/genome.cpp`.
-
-Impact on the algorithm: NEAT itself was not changed. Evaluation, speciation,
-crossover and mutation work the same way. The fix only enforces a rule that
-non-recurrent networks were already supposed to follow (information flows forward
-only), so the only difference is that networks that were previously evaluated
-incorrectly are now evaluated correctly.
-
 ## Credits
 Based on the work of:
 - [Kenneth Stanley](https://www.cs.ucf.edu/~kstanley/neat.html)

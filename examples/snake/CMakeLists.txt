@@ -2,9 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 
 project(SnakeNEAT)
 
-find_package(SFML 2 REQUIRED COMPONENTS graphics window system)
-
-add_executable(SnakeNEAT main.cpp)
+add_executable(SnakeNEAT main.cpp) 
 
 target_compile_options(SnakeNEAT PRIVATE
 	$<$<CXX_COMPILER_ID:MSVC>:/W4 /WX>
@@ -16,4 +14,4 @@ include_directories(../../include)
 add_library(neat STATIC IMPORTED)
 set_property(TARGET neat PROPERTY IMPORTED_LOCATION ../../../lib/libneat.a)
 
-target_link_libraries(SnakeNEAT neat sfml-graphics sfml-window sfml-system)
+target_link_libraries(SnakeNEAT neat sfml-window sfml-system sfml-graphics)

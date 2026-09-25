@@ -1,5 +1,18 @@
-# build para NEAT + SnakeNEAT, detecta distro/SFML/fuente solo
-# make = todo | make run = todo + ejecuta | make clean = borra build
+# ==============================================================================
+# Makefile for NEAT & SnakeNEAT - Ubuntu/Debian and Arch Linux
+# The distribution is detected automatically (pacman -> Arch, otherwise apt).
+# SFML and the font are located automatically wherever they live on this
+# machine (pkg-config first, then a list of common install prefixes).
+#
+#   make         -> deps + font + text sizes + build NEAT + Snake
+#   make run     -> same, then launch SnakeNEAT
+#   make deps    -> (re)install system dependencies
+#   make clean   -> remove build artifacts
+#   make info    -> show detected distro, tools and settings
+#
+# Requires: sudo, internet access, and a graphical session for `make run`.
+# Force a distro if detection is wrong:  make DISTRO=arch  /  make DISTRO=debian
+# ==============================================================================
 
 ROOT_DIR    := $(CURDIR)
 BUILD_DIR   := $(ROOT_DIR)/build
@@ -9,6 +22,7 @@ GENOME_SRC  := $(ROOT_DIR)/src/genome.cpp
 
 DISTRO ?= $(if $(shell command -v pacman 2>/dev/null),arch,debian)
 
+# Use the system cmake explicitly: avoids a broken copy in /usr/local/bin or ~/.local/bin
 CMAKE ?= /usr/bin/cmake
 JOBS  ?= $(shell nproc 2>/dev/null || echo 2)
 SUDO  := $(if $(filter 0,$(shell id -u)),,sudo)
@@ -17,13 +31,17 @@ CMAKE_FLAGS := -Wno-dev -Wno-deprecated --no-warn-unused-cli \
                -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
                -DNEAT_WERROR=OFF
 
-# --- SFML: pkg-config, y si no hay busca en rutas comunes ---
+# ------------------------------------------------------------------------------
+# SFML 2 discovery (any machine): pkg-config first, then common prefixes.
+# ------------------------------------------------------------------------------
 PKGCONFIG ?= pkg-config
 SFML_PC_OK := $(shell $(PKGCONFIG) --exists sfml-graphics sfml-window sfml-system sfml-audio 2>/dev/null && echo yes)
 
 ifeq ($(SFML_PC_OK),yes)
     SFML_VERSION := $(shell $(PKGCONFIG) --modversion sfml-graphics 2>/dev/null)
 else
+    # No usable .pc file: search a handful of common install locations.
+    # Add more candidates here if your distro puts SFML somewhere else.
     SFML_CANDIDATES := /opt/sfml2 /usr/local /usr
     SFML_PREFIX := $(firstword $(foreach p,$(SFML_CANDIDATES),\
                       $(if $(wildcard $(p)/include/SFML/Graphics.hpp),$(p),)))
@@ -42,7 +60,9 @@ else
     RUN_ENV :=
 endif
 
-# paquetes según distro
+# ------------------------------------------------------------------------------
+# Distro-specific package lists (only used for `make deps`)
+# ------------------------------------------------------------------------------
 ifeq ($(DISTRO),arch)
     ARCH_PKGS  := base-devel cmake pkgconf git
     CHECK_DEPS_CMD := pacman -Q $(ARCH_PKGS)
@@ -51,7 +71,10 @@ else
     CHECK_DEPS_CMD := dpkg -s $(APT_PACKAGES)
 endif
 
-# --- fuente: fontconfig, y si no hay busca rutas comunes ---
+# ------------------------------------------------------------------------------
+# Font discovery (any machine): ask fontconfig for a real sans-serif font
+# instead of assuming a fixed path. Falls back to a short candidate list.
+# ------------------------------------------------------------------------------
 FC_FONT := $(shell fc-match -f '%{file}' sans-serif 2>/dev/null)
 
 FONT_CANDIDATES := \
@@ -67,6 +90,8 @@ else
     FONT_PATH := $(firstword $(foreach f,$(FONT_CANDIDATES),$(wildcard $(f))))
 endif
 
+# Rough size heuristic: DejaVu/Noto glyphs render bigger than Cantarell at the
+# same point size, so shrink a bit when we're not sure it's Cantarell.
 ifneq ($(findstring antarell,$(FONT_PATH)),)
     override NODE_FONT_SIZE ?= 20
     override LIST_FONT_SIZE ?= 15
@@ -78,12 +103,13 @@ endif
 .PHONY: all check-deps deps deps-arch deps-debian font textsize \
         neat snake run clean info help
 
-all: neat snake ## build NEAT + SnakeNEAT
+all: neat snake ## Build NEAT + SnakeNEAT (installs deps/font if missing)
 
+# Installs dependencies only if some package is missing (works on any machine)
 check-deps:
 	@$(CHECK_DEPS_CMD) >/dev/null 2>&1 || $(MAKE) --no-print-directory deps
 
-deps: deps-$(DISTRO) ## instala dependencias del sistema
+deps: deps-$(DISTRO) ## Install system dependencies (apt or pacman+AUR)
 	@$(CMAKE) --version >/dev/null 2>&1 || { \
 		echo "ERROR: $(CMAKE) does not work."; \
 		echo "Reinstall cmake with your package manager."; \
@@ -110,7 +136,7 @@ deps-arch:
 		fi; \
 	fi
 
-font: ## muestra qué fuente se va a usar
+font: ## Report which font drawNetwork will use (no system changes needed)
 	@if [ -z "$(FONT_PATH)" ]; then \
 		echo "ERROR: no usable font found (fc-match failed and no candidate exists)."; \
 		echo "Install a font package, e.g.: sudo apt install fonts-dejavu-core"; \
@@ -119,15 +145,15 @@ font: ## muestra qué fuente se va a usar
 		echo "--> Using font: $(FONT_PATH)"; \
 	fi
 
-textsize: font ## setea fuente y tamaños de texto en genome.cpp
-	@sed -i -e "s#loadFromFile(\"[^\"]*\")#loadFromFile(\"$(FONT_PATH)\")#" $(GENOME_SRC) 2>/dev/null || true
+textsize: font ## Point drawNetwork() at the detected font and apply sizes
+	@sed -i -e "s#\(loadFromFile(\"\)[^\"]*\(\.\(ttf\|otf\)\"\)#\1$(FONT_PATH)\2#" $(GENOME_SRC) 2>/dev/null || true
 	@grep -q 'dotsText\[i\]\.setCharacterSize($(NODE_FONT_SIZE))' $(GENOME_SRC) && \
 	grep -q 'mainText\.setCharacterSize($(LIST_FONT_SIZE))' $(GENOME_SRC) || { \
 		echo "--> Setting text sizes: nodes=$(NODE_FONT_SIZE), list=$(LIST_FONT_SIZE)"; \
 		sed -i -e 's/\(dotsText\[i\]\.setCharacterSize(\)[0-9]*)/\1$(NODE_FONT_SIZE))/' \
 		      -e 's/\(mainText\.setCharacterSize(\)[0-9]*)/\1$(LIST_FONT_SIZE))/' $(GENOME_SRC); }
 
-neat: check-deps textsize ## compila libneat.a
+neat: check-deps textsize ## Compile libneat.a (also copied to lib/)
 	@echo "--> Building NEAT static library..."
 	@mkdir -p $(BUILD_DIR)
 	@cd $(BUILD_DIR) && $(CMAKE) .. $(CMAKE_FLAGS)
@@ -137,23 +163,23 @@ neat: check-deps textsize ## compila libneat.a
 	@cp -f $(BUILD_DIR)/libneat.a $(ROOT_DIR)/lib/libneat.a
 	@echo "--> [SUCCESS] Generated libneat.a"
 
-snake: neat ## compila el ejemplo SnakeNEAT
+snake: neat ## Compile SnakeNEAT example
 	@echo "--> Building SnakeNEAT example..."
 	@mkdir -p $(SNAKE_BUILD)
 	@cd $(SNAKE_BUILD) && $(CMAKE) .. $(CMAKE_FLAGS)
 	@$(MAKE) -C $(SNAKE_BUILD) -j$(JOBS)
 	@echo "--> [SUCCESS] Generated SnakeNEAT executable"
 
-run: snake ## corre SnakeNEAT
+run: snake ## Launch the SnakeNEAT simulation
 	@echo "--> Launching SnakeNEAT simulation..."
 	@$(RUN_ENV) $(SNAKE_BUILD)/SnakeNEAT
 
-clean: ## borra builds (deja .deps-cache intacto)
+clean: ## Remove build directories and libneat.a (do this before sharing)
 	@echo "--> Removing build artifacts..."
 	@rm -rf $(BUILD_DIR) $(SNAKE_BUILD) $(ROOT_DIR)/libneat.a
 	@echo "--> [CLEAN COMPLETE]"
 
-info: ## muestra distro/sfml/fuente detectados
+info: ## Show detected distro, tools and settings
 	@echo "=================================================="
 	@echo "       NEAT Project Build Configuration"
 	@echo "=================================================="
@@ -167,7 +193,7 @@ info: ## muestra distro/sfml/fuente detectados
 	@echo "Jobs         : $(JOBS)"
 	@echo "=================================================="
 
-help: ## lista los targets
+help: ## Display available targets
 	@echo "Usage: make [target]"
 	@echo ""
 	@echo "Targets:"
