@@ -1,0 +1,18 @@
+File: MnistNEAT
+Type: cpu
+Showing nodes accounting for 295.76s, 98.26% of 300.99s total
+Dropped 76 nodes (cum <= 1.50s)
+      flat  flat%   sum%        cum   cum%
+   176.48s 58.63% 58.63%    179.87s 59.76%  neat::Genome::runNetwork
+    74.16s 24.64% 83.27%     76.47s 25.41%  neat::Population::crossover
+    40.01s 13.29% 96.56%     40.02s 13.30%  neat::Population::compareGenomes
+     2.31s  0.77% 97.33%      2.31s  0.77%  neat::Genome::loadInputs
+     1.60s  0.53% 97.86%      3.39s  1.13%  activationFn
+     1.08s  0.36% 98.22%      1.72s  0.57%  processFn
+     0.12s  0.04% 98.26%    184.11s 61.17%  neat::Population::runNetworkAuto
+         0     0% 98.26%    300.99s   100%  __libc_start_call_main
+         0     0% 98.26%    300.99s   100%  __libc_start_main_impl
+         0     0% 98.26%    300.99s   100%  _start
+         0     0% 98.26%    300.99s   100%  main
+         0     0% 98.26%     40.02s 13.30%  neat::Population::speciate
+         0     0% 98.26%      1.79s  0.59%  std::exp (inline)
