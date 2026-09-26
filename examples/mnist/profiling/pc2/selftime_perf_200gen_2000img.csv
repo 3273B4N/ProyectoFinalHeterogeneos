@@ -1,0 +1,16 @@
+run,function,self_pct
+1,Genome::runNetwork,61.07
+1,Population::crossover,19.38
+1,Population::compareGenomes,16.16
+2,Genome::runNetwork,61.18
+2,Population::crossover,19.44
+2,Population::compareGenomes,16.15
+3,Genome::runNetwork,61.15
+3,Population::crossover,19.38
+3,Population::compareGenomes,16.14
+4,Genome::runNetwork,61.05
+4,Population::crossover,19.38
+4,Population::compareGenomes,16.16
+5,Genome::runNetwork,61.18
+5,Population::crossover,19.40
+5,Population::compareGenomes,16.18

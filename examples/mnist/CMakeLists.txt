@@ -21,7 +21,7 @@ function(mnist_variant name)
     target_compile_definitions(${name} PRIVATE
         MNIST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/mnist" ${ARGN})
     # genome.hpp incluye SFML, por eso se enlaza aunque no se use
-    target_link_libraries(${name} neat sfml-graphics sfml-window sfml-system)
+    target_link_libraries(${name} neat sfml-graphics sfml-window sfml-system profiler )
 endfunction()
 
 mnist_variant(MnistNEAT)
