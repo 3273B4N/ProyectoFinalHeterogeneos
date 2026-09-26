@@ -27,7 +27,7 @@ class Population{
 
 		float compareGenomes(int ig1, int ig2, float a, float b, float c);
 		void updateFitnesses();
-		int selectParent(int iSpe);
+		int selectParent(int iSpe, unsigned int* seed);
 	public:
 		int generation;
 		float avgFitness;
