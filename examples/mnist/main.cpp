@@ -82,7 +82,7 @@ struct args {
     const Dataset* data;   // imagenes con las que se evalua
     size_t index;          // imagen actual
     int correct;           // aciertos acumulados
-} myArgs;
+} ;
 
 // Template: setupFn (reinicia contadores y carga la primera imagen)
 void setupFn(float inputsInit[], void* myArgs_void) {
@@ -156,7 +156,11 @@ int main(int argc, char* argv[]) {
     }
     Dataset train = makeSubset(raw.training_images, raw.training_labels, (size_t) nbTrainImages);
     Dataset test  = makeSubset(raw.test_images, raw.test_labels, 1000);
-    myArgs.data = &train;
+    
+    std::vector<args> myArgsPerGenome((size_t) popSize);
+    for (int i = 0; i < popSize; i ++) {
+        myArgsPerGenome[(size_t) i].data = &train;
+    }
 
     // Parametros de la poblacion
     int nbHiddenInit = 0;
@@ -224,8 +228,10 @@ int main(int argc, char* argv[]) {
 #if FIX_BIAS
         for (auto& g : myPop.genomes) g.nodes[0].sumOutput = 1.0f;
 #endif
-        myPop.runNetworkAuto(processFn, &myArgs, setupFn, activationFn,
-                             maxIterationThresh, fitnessOnMaxIteration);
+        for (int genomeId = 0; genomeId < popSize; genomeId ++){
+            myPop.runNetworkAuto(processFn, &myArgsPerGenome[(size_t) genomeId], setupFn, activationFn,
+                             maxIterationThresh, fitnessOnMaxIteration, genomeId);
+        }
         auto t1 = chrono::steady_clock::now();
 
         myPop.speciate(target, targetThresh, stepThresh, a, b, c);
