@@ -12,6 +12,8 @@ endif()
 add_library(neat STATIC IMPORTED)
 set_property(TARGET neat PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/../../lib/libneat.a)
 
+find_package(OpenMP REQUIRED)
+
 function(mnist_variant name)
     add_executable(${name} main.cpp)
     target_compile_options(${name} PRIVATE -Wall -Wextra -O3 -Wno-vla)
@@ -20,8 +22,7 @@ function(mnist_variant name)
         ${CMAKE_CURRENT_SOURCE_DIR}/mnist/include)
     target_compile_definitions(${name} PRIVATE
         MNIST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/mnist" ${ARGN})
-    # genome.hpp incluye SFML, por eso se enlaza aunque no se use
-    target_link_libraries(${name} neat sfml-graphics sfml-window sfml-system)
+    target_link_libraries(${name} neat sfml-graphics sfml-window sfml-system OpenMP::OpenMP_CXX)
 endfunction()
 
 mnist_variant(MnistNEAT)

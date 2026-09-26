@@ -13,6 +13,7 @@
 #include <vector>
 #include <NEAT/population.hpp>
 #include "mnist/mnist_reader.hpp"
+#include <omp.h>
 
 using namespace std;
 using namespace neat;
@@ -228,6 +229,7 @@ int main(int argc, char* argv[]) {
 #if FIX_BIAS
         for (auto& g : myPop.genomes) g.nodes[0].sumOutput = 1.0f;
 #endif
+        #pragma omp parallel for
         for (int genomeId = 0; genomeId < popSize; genomeId ++){
             myPop.runNetworkAuto(processFn, &myArgsPerGenome[(size_t) genomeId], setupFn, activationFn,
                              maxIterationThresh, fitnessOnMaxIteration, genomeId);
