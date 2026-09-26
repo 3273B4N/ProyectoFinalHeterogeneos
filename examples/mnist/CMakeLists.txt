@@ -22,7 +22,8 @@ function(mnist_variant name)
         ${CMAKE_CURRENT_SOURCE_DIR}/mnist/include)
     target_compile_definitions(${name} PRIVATE
         MNIST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/mnist" ${ARGN})
-    target_link_libraries(${name} neat sfml-graphics sfml-window sfml-system OpenMP::OpenMP_CXX)
+    target_link_libraries(${name} neat sfml-graphics sfml-window sfml-system OpenMP::OpenMP_CXX profiler )
+
 endfunction()
 
 mnist_variant(MnistNEAT)
