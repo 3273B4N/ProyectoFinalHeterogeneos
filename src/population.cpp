@@ -1,4 +1,5 @@
 #include <NEAT/population.hpp>
+#include <omp.h>
 
 using namespace neat;
 
@@ -241,11 +242,13 @@ void Population::updateFitnesses() {
 	}
 }
 
+
+
 void Population::crossover(bool elitism) {
 	std::vector<Genome> newGenomes;
 	
-	if (elitism) {	// elitism mode on = we conserve during generations the fitter genome
-		Genome newGenome(nbInput, nbOutput, nbHiddenInit, probConnInit, &innovIds, &lastInnovId, weightExtremumInit);
+	if (elitism) {
+		Genome newGenome(nbInput, nbOutput, 0, 0.0f, &innovIds, &lastInnovId, weightExtremumInit);
 		newGenome.nodes = genomes[fitterGenomeId].nodes;
 		newGenome.connections = genomes[fitterGenomeId].connections;
 		newGenome.speciesId = genomes[fitterGenomeId].speciesId;
@@ -253,13 +256,15 @@ void Population::crossover(bool elitism) {
 	}
 	
 	for (int iSpe = 0; iSpe < (int) species.size() ; iSpe++) {
+		#pragma omp parallel for
 		for (int k = 0; k < species[iSpe].allowedOffspring; k++) {
-			// choose pseudo-randomly two parents. Don't care if they're identical as the child will be mutated...
-			int iParent1 = selectParent(iSpe);
-			int iParent2 = selectParent(iSpe);
+			unsigned int seed = (unsigned int) (generation * 1000003 + iSpe * 10007 + k * 97 + omp_get_thread_num() * 31 + 7);
 			
-			// clone the fitter
-			Genome newGenome(nbInput, nbOutput, nbHiddenInit, probConnInit, &innovIds, &lastInnovId, weightExtremumInit);
+			int iParent1 = selectParent(iSpe, &seed);
+			int iParent2 = selectParent(iSpe, &seed);
+			
+			// placeholder sin conexiones aleatorias: no toca innovIds/lastInnovId, es seguro sin critical
+			Genome newGenome(nbInput, nbOutput, 0, 0.0f, &innovIds, &lastInnovId, weightExtremumInit);
 			int iMainParent;
 			int iSecondParent;
 			if (genomes[iParent1].fitness > genomes[iParent2].fitness) {
@@ -270,39 +275,37 @@ void Population::crossover(bool elitism) {
 				iSecondParent = iParent1;
 			}
 			newGenome.nodes = genomes[iMainParent].nodes;
-			
 			newGenome.connections = genomes[iMainParent].connections;
 			newGenome.speciesId = iSpe;
 			
-			// connections shared by both of the parents must be randomly wheighted
 			for (int iMainParentConn = 0; iMainParentConn < (int) genomes[iMainParent].connections.size(); iMainParentConn++) {
 				for (int iSecondParentConn = 0; iSecondParentConn < (int) genomes[iSecondParent].connections.size(); iSecondParentConn++) {
 					if (genomes[iMainParent].connections[iMainParentConn].innovId == genomes[iSecondParent].connections[iSecondParentConn].innovId) {
-						if (rand() % 2 == 0) {	// 50 % of chance for each parent, newGenome already have the wheight of MainParent
+						if (rand_r(&seed) % 2 == 0) {
 							newGenome.connections[iMainParentConn].weight = genomes[iSecondParent].connections[iSecondParentConn].weight;
 						}
 					}
 				}
 			}
 			
-			newGenomes.push_back(newGenome);
+			#pragma omp critical
+			{
+				newGenomes.push_back(newGenome);
+			}
 		}
 	}
 	
 	int previousSize = (int) newGenomes.size();
-	// add genomes if some are missing
 	for (int k = 0; k < popSize - previousSize; k++) {
 		newGenomes.push_back(Genome(nbInput, nbOutput, nbHiddenInit, probConnInit, &innovIds, &lastInnovId, weightExtremumInit));
 	}
 	
-	// or remove some genomes if there is too many genomes
 	for (int k = 0; k < previousSize - popSize; k++) {
 		newGenomes.pop_back();
 	}
 	
 	genomes = newGenomes;
 	
-	// reset species members
 	for (int i = 0; i < (int) species.size(); i++) {
 		species[i].members.clear();
 		species[i].isDead = true;
@@ -310,21 +313,18 @@ void Population::crossover(bool elitism) {
 	for (int i = 0; i < popSize; i++) {
 		if (genomes[i].speciesId > -1) {
 			species[genomes[i].speciesId].members.push_back(i);
-			species[genomes[i].speciesId].isDead = false;	// empty species will stay to isDead = true
+			species[genomes[i].speciesId].isDead = false;
 		}
 	}
 	
-	fitterGenomeId = -1;	// avoid to missuse fitterGenomeId
-	
+	fitterGenomeId = -1;
 	generation ++;
 }
 
-int Population::selectParent(int iSpe) {
-	/* Chooses player from the population to return randomly(considering fitness). This works by randomly choosing a value between 0 and the sum of all the fitnesses then go through all the dots and add their fitness to a running sum and if that sum is greater than the random value generated that dot is chosen since players with a higher fitness function add more to the running sum then they have a higher chance of being chosen */
-	// build a random threshold in [0, sumFitness)
-	float randThresh = (float) rand()/(float) (RAND_MAX);
-	while (randThresh < 1.0f + 1e-10 && randThresh > 1.0f - 1e-10) {	// == 1
-		randThresh = (float) rand()/(float) (RAND_MAX);
+int Population::selectParent(int iSpe, unsigned int* seed) {
+	float randThresh = (float) rand_r(seed)/(float) (RAND_MAX);
+	while (randThresh < 1.0f + 1e-10 && randThresh > 1.0f - 1e-10) {
+		randThresh = (float) rand_r(seed)/(float) (RAND_MAX);
 	}
 	randThresh *= species[iSpe].sumFitness;
 	
@@ -337,9 +337,8 @@ int Population::selectParent(int iSpe) {
 		}
 	}
 	std::cout << "Error : don't find a parent during crossover." << std::endl;
-	return -1;	// impossible
+	return -1;
 }
-
 void Population::mutate(float mutateWeightThresh, float mutateWeightFullChangeThresh, float mutateWeightFactor, float addConnectionThresh, int maxIterationsFindConnectionThresh, float reactivateConnectionThresh, float addNodeThresh, int maxIterationsFindNodeThresh) {
 	for (int i = 0; i < popSize; i++) {
 		genomes[i].mutate(&innovIds, &lastInnovId, areRecurrentConnectionsAllowed, mutateWeightThresh, mutateWeightFullChangeThresh, mutateWeightFactor, addConnectionThresh, maxIterationsFindConnectionThresh, reactivateConnectionThresh, addNodeThresh, maxIterationsFindNodeThresh);
