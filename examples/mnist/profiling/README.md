@@ -1,4 +1,4 @@
-# Perfilado de MNIST 
+# Perfilado de MNIST - sin optimizar
 Nota: en ambas computadoras se corrieron 5 iteracion del mismo ejecutable, lo cual se hizo para tener una media del perfilado.
 ## Nota sobre el script de perfilado:
 Con el fin de facilitar los resultados del perfilado y automatizar este proceso, se generó el script `profiling.sh` con la ayuda de IA para acelerar este proceso
@@ -42,15 +42,8 @@ bash profiling.sh ../build/MnistNEAT 60 1000 150 42 5 pc2
 ### Configuración de la prueba 
 
 200 generaciones, 2000 imágenes de entrenamiento, población 150, semilla 42.
-### Archivos
 
-| Archivo | Herramienta | Configuración |
-|---|---|---|
-| `pc1/perf_mnist_200gen.txt` | perf | 200 gen, 2000 img, pop 150, semilla 42 |
-| `pc1/gperf_mnist_200gen_top.txt` | gperftools | 200 gen, 2000 img, pop 150, semilla 42 |
-| `pc1/mnist_neat_log.csv` | log interno del programa | 200 gen, 2000 img, pop 150, semilla 42 — tiempo por etapa y precisión por generación |
-
-### Resultados: % de tiempo por función (Self)
+### Resultados de profiling 
 
 | Función (etapa) | perf | gperftools |
 |---|---|---|
@@ -102,4 +95,41 @@ Los porcentajes de `perf` y `gperftools` tienen una diferencia inferior a 0.5, l
 El tiempo de ejecución es dominado por `runNetwork` (cerca del 59% para la pc1 y un 60% para la pc2), seguido de `crossover` (aproximadamente el 25% y un 19.4%) y finalmente `compareGenomes` (alrededor del 16.16%). En esta prueba, `crossover` y `compareGenomes` se escalan con el tamaño de la población (150), mientras que `runNetwork` lo hace según la cantidad de imágenes evaluadas por cada generación. Por lo que la optimización se realizará principalmente en runNetwork y en crossover.
 
 
+# Perfilado de MNIST - optimizado
 
+## Computadora 1
+
+**Configuración:** 200 generaciones / 2000 imágenes / población de 150 / semilla 42 — 5 corridas
+
+### Resultados del profiling
+
+| Herramienta | Métrica | Valor | Propio | % propio | % acum. |
+|---|---|---|---|---|---|
+| perf stat | Tiempo total (real, wall-clock) | 90.91 s ± 5.10 s | -- | -- | -- |
+| perf stat | Task-clock (CPU sumada, todos los hilos) | 376.71 s | -- | -- | -- |
+| perf stat | CPUs utilizadas (promedio) | 4.1 | -- | -- | -- |
+| perf stat | Instrucciones (cpu_core) | 7,262,771,284,330 | -- | -- | -- |
+| perf stat | IPC (cpu_core) | 7.2 | -- | -- | -- |
+| perf stat | Ciclos de CPU (cpu_core) | 1,008,454,510,693 (2.7 GHz) | -- | -- | -- |
+| perf stat | Branch misses (cpu_core) | 942,548,026 (0.1%) | -- | -- | -- |
+| perf stat | Page faults | 32,108 | -- | -- | -- |
+| perf record/report | `Genome::runNetwork` | -- | -- | 67.32% | -- |
+| perf record/report | `Population::crossover` | -- | -- | 27.27% | -- |
+| perf record/report | `Population::compareGenomes` | -- | -- | 0.43% | -- |
+| gperftools | `Genome::runNetwork` | -- | 867.41 s | 55.58% | 55.58% |
+| gperftools | `Population::crossover` | -- | 202.23 s | 12.96% | 68.54% |
+| gperftools | `std::vector::size` (inline) | -- | 162.59 s | 10.42% | 78.96% |
+| gperftools | `Population::compareGenomes` | -- | 143.41 s | 9.19% | 88.14% |
+| gperftools | `std::vector::operator[]` (inline) | -- | 123.58 s | 7.92% | 96.06% |
+| gperftools | `Genome::loadInputs` | -- | 11.77 s | 0.75% | 96.82% |
+| gperftools | `__expf_fma` | -- | 8.48 s | 0.54% | 97.36% |
+| gperftools | `processFn` | -- | 7.66 s | 0.49% | 97.85% |
+| gperftools | `__random` | -- | 7.52 s | 0.48% | 98.33% |
+
+El procesador tiene núcleos de rendimiento (P-core) y eficientes (E-core), y `perf` reporta contadores separados (`cpu_core`/`cpu_atom`) para cada tipo. La tabla muestra los valores de `cpu_core`, donde se concentró la mayoría del trabajo.
+
+### Comparación
+
+| Métrica | Sin optimizar | Optimizado (OpenMP) | Mejora |
+|---|---|---|---|
+| Tiempo total | 300.99 s | 90.91 s ± 5.10 s | **~3.3×** |
