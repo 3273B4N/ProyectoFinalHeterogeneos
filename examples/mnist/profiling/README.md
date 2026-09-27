@@ -45,17 +45,32 @@ bash profiling.sh ../build/MnistNEAT 60 1000 150 42 5 pc2
 
 ### Resultados de profiling 
 
-| Función (etapa) | perf | gperftools |
-|---|---|---|
-| `Genome::runNetwork` (evaluación) | 58.80% | 58.63% |
-| `Population::crossover` (cruce) | 24.83% | 24.64% |
-| `Population::compareGenomes` (especiación) | 13.00% | 13.29% |
+**Configuración:** 200 generaciones / 2000 imágenes / población de 150 / semilla 42 — 5 corridas
 
-Los porcentajes de `perf` y `gperftools` tienen una diferencia inferior a 0.5, lo que confirma el diagnóstico con dos instrumentos independientes que emplean métodos de muestreo diferentes.
-
+| Herramienta | Métrica | Valor | Propio | % propio | % acum. |
+|---|---|---|---|---|---|
+| perf stat | Tiempo total (real, wall-clock) | 193.95 s ± 1.06 s | -- | -- | -- |
+| perf stat | Task-clock | 193.72 s | -- | -- | -- |
+| perf stat | CPUs utilizadas (promedio) | 1.0 | -- | -- | -- |
+| perf stat | Instrucciones (cpu_core) | 6,307,085,857,759 | -- | -- | -- |
+| perf stat | IPC (cpu_core) | 7.2 | -- | -- | -- |
+| perf stat | Ciclos de CPU (cpu_core) | 878,943,591,627 (4.5 GHz) | -- | -- | -- |
+| perf stat | Branch misses (cpu_core) | 729,562,231 (0.1%) | -- | -- | -- |
+| perf stat | Page faults | 31,809 | -- | -- | -- |
+| perf record/report | `Genome::runNetwork` | -- | -- | 58.76% ± 0.05 | -- |
+| perf record/report | `Population::crossover` | -- | -- | 24.61% ± 0.01 | -- |
+| perf record/report | `Population::compareGenomes` | -- | -- | 12.91% ± 0.01 | -- |
+| gperftools | `Genome::runNetwork` | -- | 485.25 s | 50.34% | 50.34% |
+| gperftools | `Population::crossover` | -- | 127.07 s | 13.18% | 63.53% |
+| gperftools | `Population::compareGenomes` | -- | 124.06 s | 12.87% | 76.40% |
+| gperftools | `std::vector::size` (inline) | -- | 108.14 s | 11.22% | 87.62% |
+| gperftools | `std::vector::operator[]` (inline) | -- | 86.40 s | 8.96% | 96.58% |
+| gperftools | `Genome::loadInputs` | -- | 6.98 s | 0.72% | 97.31% |
+| gperftools | `activationFn` | -- | 4.81 s | 0.50% | 97.81% |
+| gperftools | `__expf_fma` | -- | 4.74 s | 0.49% | 98.30% |
+| gperftools | `processFn` | -- | 4.19 s | 0.43% | 98.73% |
 ### Tiempo total
 
-**300.99 s** de tiempo total de CPU (perfilado con gperftools).
 
 ## Computadora 2
 
@@ -130,6 +145,12 @@ El procesador tiene núcleos de rendimiento (P-core) y eficientes (E-core), y `p
 
 ### Comparación
 
-| Métrica | Sin optimizar | Optimizado (OpenMP) | Mejora |
+| Métrica | Sin optimizar | Optimizado | Mejora |
 |---|---|---|---|
-| Tiempo total | 300.99 s | 90.91 s ± 5.10 s | **~3.3×** |
+| Tiempo total (wall-clock) | 193.95 s ± 1.06 s | 90.91 s ± 5.10 s | **~2.13×** |
+| CPUs utilizadas (promedio) | 1.0 | 4.1 | — |
+| `Genome::runNetwork` (perf) | 58.76% ± 0.05 | 67.32% | — |
+| `Population::crossover` (perf) | 24.61% ± 0.01 | 27.27% | — |
+| `Population::compareGenomes` (perf) | 12.91% ± 0.01 | 0.43% | — |
+
+Con una metodología similar en los dos casos (200 generaciones, 2000 imágenes, población de 150, semilla de 42 y cinco repeticiones), la optimización con OpenMP disminuye el tiempo real de ejecución de **193.95 s ± 1.06 s** a **90.91 s ± 5.10 s**, lo que representa una mejora aproximada del **~2.13x**. Esto concuerda con el incremento en el uso de CPU reportado por `perf stat` (de 1.0 CPU empleada, lo que indica ejecución en un solo hilo, a 4.1 CPUs en la versión paralela). Se confirma que `Genome::runNetwork` sigue siendo la etapa predominante en las dos versiones (58.76% → 67.32% de tiempo propio), seguida por `Population::crossover` (24.61% → 27.27%). En cambio, `Population::compareGenomes` disminuyó desde el 12.91% hasta un mínimo del 0.43%. Por otra parte, que el porcentaje relativo de `runNetwork` y `crossover` se haya incrementado no significa que sean más lentas, ya que al disminuir el tiempo total, cualquier fase no optimizada ocupa una porción más grande del conjunto.
