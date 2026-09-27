@@ -153,4 +153,44 @@ El procesador tiene núcleos de rendimiento (P-core) y eficientes (E-core), y `p
 | `Population::crossover` (perf) | 24.61% ± 0.01 | 27.27% | — |
 | `Population::compareGenomes` (perf) | 12.91% ± 0.01 | 0.43% | — |
 
-Con una metodología similar en los dos casos (200 generaciones, 2000 imágenes, población de 150, semilla de 42 y cinco repeticiones), la optimización con OpenMP disminuye el tiempo real de ejecución de **193.95 s ± 1.06 s** a **90.91 s ± 5.10 s**, lo que representa una mejora aproximada del **~2.13x**. Esto concuerda con el incremento en el uso de CPU reportado por `perf stat` (de 1.0 CPU empleada, lo que indica ejecución en un solo hilo, a 4.1 CPUs en la versión paralela). Se confirma que `Genome::runNetwork` sigue siendo la etapa predominante en las dos versiones (58.76% → 67.32% de tiempo propio), seguida por `Population::crossover` (24.61% → 27.27%). En cambio, `Population::compareGenomes` disminuyó desde el 12.91% hasta un mínimo del 0.43%. Por otra parte, que el porcentaje relativo de `runNetwork` y `crossover` se haya incrementado no significa que sean más lentas, ya que al disminuir el tiempo total, cualquier fase no optimizada ocupa una porción más grande del conjunto.
+Con una metodología similar en los dos casos (200 generaciones, 2000 imágenes, población de 150, semilla de 42 y cinco repeticiones), la optimización con OpenMP disminuye el tiempo real de ejecución de **193.95 s ± 1.06 s** a **90.91 s ± 5.10 s**, lo que representa una mejora aproximada del **~2.13x**. Esto concuerda con el incremento en el uso de CPU reportado por `perf stat` (de 1.0 CPU empleada, lo que indica ejecución en un solo hilo, a 4.1 CPUs en la versión paralela). Se confirma que `Genome::runNetwork` sigue siendo la etapa predominante en las dos versiones (58.76% a 67.32% de tiempo propio), seguida por `Population::crossover` (24.61% a 27.27%). En cambio, `Population::compareGenomes` disminuyó desde el 12.91% hasta un mínimo del 0.43%. Por otra parte, que el porcentaje relativo de `runNetwork` y `crossover` se haya incrementado no significa que sean más lentas, ya que al disminuir el tiempo total, cualquier fase no optimizada ocupa una porción más grande del conjunto.
+
+## Computadora 2 
+
+Con la misma configuracion de la computadora 1
+
+### Resultados de profiling 
+
+| Herramienta | Métrica | Valor | Propio | % propio | % acum. |
+|---|---|---|---|---|---|
+| perf stat | Tiempo transcurrido (wall clock) | 188.27 s ± 1.24 s | -- | -- | -- |
+| perf stat | Tiempo de CPU (task-clock, suma de núcleos) | 445.92 s | -- | -- | -- |
+| perf stat | CPUs utilizados | 2.4 | -- | -- | -- |
+| perf stat | Instrucciones | 6,250,131,478,648 | -- | -- | -- |
+| perf stat | IPC (instrucciones/ciclo) | 4.3 | -- | -- | -- |
+| perf stat | Ciclos de CPU | 1,449,066,181,921 (3.2 GHz) | -- | -- | -- |
+| perf stat | Branch misses | 612,788,708 (0.0%) | -- | -- | -- |
+| perf stat | Page faults | 19,100 | -- | -- | -- |
+| perf stat | Context switches | 55,379 | -- | -- | -- |
+| perf stat | CPU migrations | 736 | -- | -- | -- |
+| perf record/report | `Genome::runNetwork` | -- | -- | 59.69% ± 0.04 | -- |
+| perf record/report | `Population::crossover` | -- | -- | 19.07% ± 0.04 | -- |
+| perf record/report | `Population::compareGenomes` | -- | -- | 15.52% ± 0.03 | -- |
+| gperftools | `Genome::runNetwork` | -- | 1463.58 s | 64.61% | 64.61% |
+| gperftools | `Population::crossover` | -- | 360.76 s | 15.92% | 80.53% |
+| gperftools | `Population::compareGenomes` | -- | 292.01 s | 12.89% | 93.42% |
+| gperftools | `omp_get_num_procs` | -- | 70.96 s | 3.13% | 96.55% |
+| gperftools | `Genome::loadInputs` | -- | 19.66 s | 0.87% | 97.42% |
+| gperftools | `processFn` | -- | 13.32 s | 0.59% | 98.01% |
+| gperftools | `rand` | -- | 0.77 s | 0.03% | 98.04% |
+| gperftools | `main._omp_fn.0` | -- | 0.01 s | 0.00% | 98.04% |
+
+### Comparación
+
+Como se observó con la computadora 1, la optimización con OpenMP redujo el tiempo de ejecución de 364.15 s a 188.27 s (~1.9x), a costa de un mayor tiempo de CPU total por la
+coordinación entre hilos. El cuello de botella sigue siendo el mismo:
+`Genome::runNetwork` concentra la mayor parte del tiempo (60-65%),
+seguido de `crossover` y `compareGenomes`.
+
+
+
