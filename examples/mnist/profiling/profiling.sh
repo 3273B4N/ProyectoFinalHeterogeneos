@@ -34,7 +34,7 @@ IMAGES="${3:?falta num imagenes}"
 POP="${4:?falta poblacion}"
 SEED="${5:?falta semilla}"
 N_RUNS="${6:-5}"
-OUTDIR="${7:-pc2}"
+OUTDIR="${7:-./pc2}"
 
 if [[ ! -f "$BIN" ]]; then
   echo "ERROR: no se encontro el binario en: $BIN" >&2
@@ -91,8 +91,7 @@ for i in $(seq 1 "$N_RUNS"); do
       "$BIN" "${RUN_ARGS[@]}" \
       > "${RUNDIR}/stdout_run${i}.log" 2>&1
 
-  perf report --input="$PERF_DATA" --stdio -g none --sort=overhead,symbol --no-children> "$PERF_TXT"
-
+  perf report --input="$PERF_DATA" --stdio -g none --sort=overhead,symbol --no-children | c++filt > "$PERF_TXT"
   N_SAMPLES=$(perf script --input="$PERF_DATA" | wc -l)
   echo "  perf: $N_SAMPLES muestras"
 
