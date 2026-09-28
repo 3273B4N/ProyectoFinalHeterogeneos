@@ -106,6 +106,7 @@ bash profiling.sh ../build/MnistNEAT 60 1000 150 42 5 pc2
 | gperftools | `processFn` | -- | 10.42 s | 0.57% | 98.11% |
 | gperftools | `Population::runNetworkAuto` | -- | 0.72 s | 0.04% | 98.15% |
 
+<<<<<<< HEAD
 
 ## Jetson Nano
 
@@ -157,6 +158,44 @@ bash profiling.sh ../build/MnistNEAT 60 1000 150 42 5 pc2
 | perf stat | Context switches | 3,707 |
 | programa | Tiempo total reportado (5 corridas) | 690.0 – 692.4 s (media 691.5 s) |
 | programa | Reparto por etapa | evaluar 68% / especiar 15% / cruzar 17% / mutar 0% |
+=======
+## Sistema empotrado (Jetson)
+
+### Equipo utilizado
+
+- **Modelo:** NVIDIA Jetson (host `jetson-181`)
+- **Versión evaluada:** sin optimizar (1.0 CPU utilizada)
+
+### Resultados de profiling
+
+**Configuración:** 10 generaciones / 2000 imágenes / población de 150 / semilla 42 — 2 corridas, esto se realizo asi debido al excesivo tiempo de corrida de la jetson
+
+| Herramienta | Métrica | Valor | Propio | % propio | % acum. |
+|---|---|---|---|---|---|
+| perf stat | Tiempo total (wall-clock) | 135.17 s ± 0.09% | -- | -- | -- |
+| perf stat | Task-clock | 135.12 s | -- | -- | -- |
+| perf stat | CPUs utilizadas (promedio) | 1.0 | -- | -- | -- |
+| perf stat | Instrucciones | 241,290,505,625 | -- | -- | -- |
+| perf stat | IPC | 1.88 | -- | -- | -- |
+| perf stat | Ciclos de CPU | 128,224,055,624 (0.95 GHz) | -- | -- | -- |
+| perf stat | Branch misses | 40,542,769 (branches no soportado) | -- | -- | -- |
+| perf stat | Page faults | 19,744 | -- | -- | -- |
+| perf stat | Context switches | 1,208 | -- | -- | -- |
+| perf stat | CPU migrations | 0 | -- | -- | -- |
+| perf record/report | `Genome::runNetwork` | -- | -- | 59.56%  | -- |
+| perf record/report | `Population::crossover` | -- | -- | 16.48%  | -- |
+| perf record/report | `Population::compareGenomes` | -- | -- | 15.44%  | -- |
+| gperftools | `Genome::runNetwork` | -- | 162.57 s | 59.9% | 59.9% |
+| gperftools | `Population::crossover` | -- | 45.10 s | 16.6% | 76.5% |
+| gperftools | `Population::compareGenomes` | -- | 42.01 s | 15.5% | 92.0% |
+| gperftools | `Genome::loadInputs` | -- | 8.05 s | 3.0% | 95.0% |
+| gperftools | `processFn` | -- | 2.71 s | 1.0% | 96.0% |
+| gperftools | `mnist::read_mnist_image_file` | -- | 1.09 s | 0.4% | 96.4% |
+| gperftools | `__random` | -- | 1.03 s | 0.4% | 96.8% |
+| gperftools | `__GI___expf` | -- | 0.93 s | 0.3% | 97.1% |
+
+
+>>>>>>> bedfcf7 (docs(profiling): add metrics table withput optimization for Jetson Nano)
 
 
 ### Conclusiones 
