@@ -106,6 +106,59 @@ bash profiling.sh ../build/MnistNEAT 60 1000 150 42 5 pc2
 | gperftools | `processFn` | -- | 10.42 s | 0.57% | 98.11% |
 | gperftools | `Population::runNetworkAuto` | -- | 0.72 s | 0.04% | 98.15% |
 
+
+## Jetson Nano
+
+### Equipo utilizado
+
+| Componente | Especificación |
+|---|---|
+| Modelo | NVIDIA Jetson Nano 2GB Developer Kit |
+| JetPack / L4T | JetPack 4.6.1 (L4T R32.7.1) |
+| Sistema operativo | Ubuntu 18.04.6 LTS (kernel 4.9.253-tegra) |
+| CPU | ARM Cortex-A57, 4 núcleos (aarch64) |
+| Memoria | 2 GB LPDDR4, compartida entre CPU y GPU |
+| GPU | NVIDIA Maxwell, 128 núcleos CUDA (1 SM), compute capability 5.3 |
+
+### Resultados de profiling (10 generaciones / 2000 imágenes, población de 150 y semilla 42, 2 corridas)
+
+| Herramienta | Métrica | Valor | Propio | % propio | % acum. |
+|---|---|---|---|---|---|
+| perf stat | Tiempo total (real, wall-clock) | 135.17 s ± 0.09% | -- | -- | -- |
+| perf stat | Task-clock | 135.12 s | -- | -- | -- |
+| perf stat | CPUs utilizadas (promedio) | 1.0 | -- | -- | -- |
+| perf stat | Instrucciones | 241,290,505,625 | -- | -- | -- |
+| perf stat | IPC (instrucciones/ciclo) | 1.88 | -- | -- | -- |
+| perf stat | Ciclos de CPU | 128,224,055,624 (0.95 GHz) | -- | -- | -- |
+| perf stat | Branch misses | 40,542,769 | -- | -- | -- |
+| perf stat | Page faults | 19,744 | -- | -- | -- |
+| perf stat | Context switches | 1,208 | -- | -- | -- |
+| perf record/report | `Genome::runNetwork` | -- | -- | 59.56% ± 0.08 | -- |
+| perf record/report | `Population::crossover` | -- | -- | 16.48% ± 0.03 | -- |
+| perf record/report | `Population::compareGenomes` | -- | -- | 15.44% ± 0.01 | -- |
+| gperftools | `Genome::runNetwork` | -- | 16,257 muestras | 59.9% | 59.9% |
+| gperftools | `Population::crossover` | -- | 4,510 muestras | 16.6% | 76.5% |
+| gperftools | `Population::compareGenomes` | -- | 4,201 muestras | 15.5% | 92.0% |
+| gperftools | `Genome::loadInputs` | -- | 805 muestras | 3.0% | 95.0% |
+| gperftools | `processFn` | -- | 271 muestras | 1.0% | 96.0% |
+
+### Prueba adicional (50 generaciones / 2000 imágenes, población de 150 y semilla 42, 5 corridas)
+
+| Herramienta | Métrica | Valor |
+|---|---|---|
+| perf stat | Tiempo total (real, wall-clock) | 693.68 s ± 0.06% |
+| perf stat | Task-clock | 693.51 s |
+| perf stat | CPUs utilizadas (promedio) | 1.0 |
+| perf stat | Instrucciones | 1,264,811,803,645 |
+| perf stat | IPC (instrucciones/ciclo) | 1.92 |
+| perf stat | Ciclos de CPU | 657,092,999,924 (0.95 GHz) |
+| perf stat | Branch misses | 219,172,311 |
+| perf stat | Page faults | 21,799 |
+| perf stat | Context switches | 3,707 |
+| programa | Tiempo total reportado (5 corridas) | 690.0 – 692.4 s (media 691.5 s) |
+| programa | Reparto por etapa | evaluar 68% / especiar 15% / cruzar 17% / mutar 0% |
+
+
 ### Conclusiones 
 El tiempo de ejecución es dominado por `runNetwork` (cerca del 59% para la pc1 y un 60% para la pc2), seguido de `crossover` (aproximadamente el 25% y un 19.4%) y finalmente `compareGenomes` (alrededor del 16.16%). En esta prueba, `crossover` y `compareGenomes` se escalan con el tamaño de la población (150), mientras que `runNetwork` lo hace según la cantidad de imágenes evaluadas por cada generación. Por lo que la optimización se realizará principalmente en runNetwork y en crossover.
 
