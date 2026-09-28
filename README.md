@@ -36,13 +36,6 @@ Con los cuellos de botella del perfilado identificados, se paralelizaron con **O
 | `runNetworkAuto` (evaluación) | `examples/mnist/main.cpp` | Un hilo por genoma (`#pragma omp parallel for`). Se le dio a cada genoma su propio `struct args` (antes era uno global compartido) para evitar condición de carrera. |
 | `crossover` / `selectParent` (cruce) | `src/population.cpp` | Un hilo por hijo dentro de cada especie. `rand()` (no thread-safe) se cambió por `rand_r()` con semilla propia por hilo/tarea; el único punto compartido (`newGenomes.push_back`) se protegió con `#pragma omp critical`. |
 
-**Bug pendiente de corregir:** el `CMakeLists.txt` de la raíz (el que compila `libneat.a`, donde vive `population.cpp`) nunca agrega `find_package(OpenMP)` ni `-fopenmp` — solo lo agrega el `CMakeLists.txt` de `examples/mnist/`, y ese flag solo aplica a `main.cpp`. Resultado: el compilador ignora silenciosamente el `#pragma omp` de `crossover()` (compila y linkea sin error), así que hoy esa parte corre secuencial; solo la paralelización de `runNetworkAuto` está realmente activa. Arreglo:
-
-```cmake
-find_package(OpenMP REQUIRED)
-target_link_libraries(neat PUBLIC OpenMP::OpenMP_CXX)
-```
-
 ## Compilar y correr
 
 ```bash
