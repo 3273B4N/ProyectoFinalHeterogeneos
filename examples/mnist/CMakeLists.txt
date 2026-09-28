@@ -37,6 +37,9 @@ function(mnist_variant name use_omp)
 
   if(use_omp)
     target_link_libraries(${name} PRIVATE OpenMP::OpenMP_CXX)
+  else()
+    # libneat.a usa OpenMP: solo el runtime (libgomp), sin -fopenmp en main.cpp
+    target_link_libraries(${name} PRIVATE ${OpenMP_CXX_LIBRARIES})
   endif()
 
   target_link_options(${name} PRIVATE -no-pie)
