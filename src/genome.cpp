@@ -353,7 +353,7 @@ void Genome::drawNetwork(sf::Vector2u windowSize, float dotsRadius) {
     
     // ### NODES ###
 	sf::Font font;
-	if (!font.loadFromFile("/usr/share/fonts/TTF/DejaVuSans.ttf")) {
+	if (!font.loadFromFile("/usr/share/fonts/TTF/DejaVuSans.ttf.otf")) {
 		std::cout << "Error while loading font in 'Genome::drawNetwork'." << std::endl;
 	}
 

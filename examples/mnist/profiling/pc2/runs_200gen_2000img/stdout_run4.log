@@ -1,0 +1,159 @@
+Cargando MNIST desde /home/esteb/Documents/Semestre_10/Heterogeneos/Proyecto/ProyectoF/NEAT/examples/mnist/mnist ...
+Poblacion 150 | 2000 imagenes de entrenamiento | 1000 de prueba | 200 generaciones | semilla 42
+Ajustes: FIX_BIAS=1 PROTECT_ELITE=1 TEMPLATE_PARAMS=0
+
+gen    0 | train  18.1% | test  17.5% | evaluar 0.77s especiar 0.29s cruzar 0.37s mutar 0.000s
+gen   10 | train  38.3% | test  31.3% | evaluar 0.81s especiar 0.29s cruzar 0.37s mutar 0.000s
+gen   20 | train  47.7% | test  42.9% | evaluar 0.81s especiar 0.28s cruzar 0.36s mutar 0.000s
+gen   30 | train  51.8% | test  47.8% | evaluar 0.89s especiar 0.28s cruzar 0.36s mutar 0.000s
+gen   40 | train  53.5% | test  48.5% | evaluar 1.01s especiar 0.28s cruzar 0.36s mutar 0.000s
+gen   50 | train  56.6% | test  52.6% | evaluar 0.98s especiar 0.28s cruzar 0.37s mutar 0.000s
+gen   60 | train  61.0% | test  56.4% | evaluar 0.86s especiar 0.28s cruzar 0.35s mutar 0.000s
+gen   70 | train  61.3% | test  56.0% | evaluar 0.88s especiar 0.28s cruzar 0.36s mutar 0.000s
+gen   80 | train  62.8% | test  55.0% | evaluar 0.97s especiar 0.28s cruzar 0.36s mutar 0.000s
+gen   90 | train  63.6% | test  56.7% | evaluar 1.05s especiar 0.28s cruzar 0.37s mutar 0.000s
+gen  100 | train  64.8% | test  59.0% | evaluar 1.21s especiar 0.30s cruzar 0.36s mutar 0.000s
+gen  110 | train  65.9% | test  59.8% | evaluar 1.39s especiar 0.28s cruzar 0.37s mutar 0.000s
+gen  120 | train  66.2% | test  59.7% | evaluar 1.35s especiar 0.28s cruzar 0.36s mutar 0.000s
+gen  130 | train  67.2% | test  59.7% | evaluar 1.41s especiar 0.29s cruzar 0.36s mutar 0.000s
+gen  140 | train  67.9% | test  61.5% | evaluar 1.40s especiar 0.29s cruzar 0.36s mutar 0.000s
+gen  150 | train  68.7% | test  60.1% | evaluar 1.38s especiar 0.28s cruzar 0.36s mutar 0.000s
+gen  160 | train  68.8% | test  60.2% | evaluar 1.42s especiar 0.28s cruzar 0.37s mutar 0.000s
+gen  170 | train  69.0% | test  61.7% | evaluar 1.38s especiar 0.29s cruzar 0.36s mutar 0.000s
+gen  180 | train  69.2% | test  63.0% | evaluar 1.43s especiar 0.29s cruzar 0.37s mutar 0.000s
+gen  190 | train  69.7% | test  61.9% | evaluar 1.42s especiar 0.29s cruzar 0.37s mutar 0.000s
+gen  199 | train  69.7% | test  61.9% | evaluar 1.42s especiar 0.28s cruzar 0.36s mutar 0.000s
+
+Tiempo total 362.5s: evaluar 64% | especiar 16% | cruzar 20% | mutar 0%
+
+Ejemplos con el mejor individuo:
+                                
+                                
+                                
+          ::--..                
+          ****%%%%%%%%%%++      
+                ......++++      
+                    ..@@..      
+                    **==        
+                  ..%%..        
+                  ##==          
+                ==##            
+              ..@@..            
+              **@@..            
+              --::              
+    real: 7   NEAT dice: 7
+
+                                
+              ::====..          
+            ++@@%%%%++          
+          ..@@::  ++**          
+                ..%%++          
+                **%%..          
+              ==@@::            
+            ..%%++              
+            ++%%..              
+            @@++        ..----  
+            %%@@@@@@##%%@@%%##::
+            ..::--====::        
+                                
+                                
+    real: 2   NEAT dice: 6
+
+                                
+                                
+                    **::        
+                    ##          
+                  --++          
+                  **==          
+                ..##..          
+                --##            
+                **--            
+                %%::            
+              ::@@..            
+              ==++              
+                                
+                                
+    real: 1   NEAT dice: 1
+
+Registro por generacion en mnist_neat_log.csv; poblacion guardada en mnist_neat_backup.txt
+[ perf record: Woken up 96 times to write data ]
+[ perf record: Captured and wrote 24.356 MB pc2/runs_200gen_2000img/perf_200gen_2000img_run4.data (362265 samples) ]
+Cargando MNIST desde /home/esteb/Documents/Semestre_10/Heterogeneos/Proyecto/ProyectoF/NEAT/examples/mnist/mnist ...
+Poblacion 150 | 2000 imagenes de entrenamiento | 1000 de prueba | 200 generaciones | semilla 42
+Ajustes: FIX_BIAS=1 PROTECT_ELITE=1 TEMPLATE_PARAMS=0
+
+gen    0 | train  18.1% | test  17.5% | evaluar 0.75s especiar 0.28s cruzar 0.36s mutar 0.000s
+gen   10 | train  38.3% | test  31.3% | evaluar 0.82s especiar 0.29s cruzar 0.37s mutar 0.000s
+gen   20 | train  47.7% | test  42.9% | evaluar 0.84s especiar 0.29s cruzar 0.37s mutar 0.000s
+gen   30 | train  51.8% | test  47.8% | evaluar 0.91s especiar 0.28s cruzar 0.36s mutar 0.000s
+gen   40 | train  53.5% | test  48.5% | evaluar 0.99s especiar 0.28s cruzar 0.35s mutar 0.000s
+gen   50 | train  56.6% | test  52.6% | evaluar 1.00s especiar 0.29s cruzar 0.37s mutar 0.000s
+gen   60 | train  61.0% | test  56.4% | evaluar 0.89s especiar 0.28s cruzar 0.36s mutar 0.000s
+gen   70 | train  61.3% | test  56.0% | evaluar 0.89s especiar 0.29s cruzar 0.37s mutar 0.000s
+gen   80 | train  62.8% | test  55.0% | evaluar 0.99s especiar 0.28s cruzar 0.37s mutar 0.000s
+gen   90 | train  63.6% | test  56.7% | evaluar 1.05s especiar 0.28s cruzar 0.36s mutar 0.000s
+gen  100 | train  64.8% | test  59.0% | evaluar 1.20s especiar 0.28s cruzar 0.36s mutar 0.000s
+gen  110 | train  65.9% | test  59.8% | evaluar 1.42s especiar 0.30s cruzar 0.37s mutar 0.000s
+gen  120 | train  66.2% | test  59.7% | evaluar 1.41s especiar 0.29s cruzar 0.37s mutar 0.000s
+gen  130 | train  67.2% | test  59.7% | evaluar 1.39s especiar 0.28s cruzar 0.36s mutar 0.000s
+gen  140 | train  67.9% | test  61.5% | evaluar 1.42s especiar 0.29s cruzar 0.37s mutar 0.000s
+gen  150 | train  68.7% | test  60.1% | evaluar 1.42s especiar 0.29s cruzar 0.37s mutar 0.000s
+gen  160 | train  68.8% | test  60.2% | evaluar 1.39s especiar 0.28s cruzar 0.37s mutar 0.000s
+gen  170 | train  69.0% | test  61.7% | evaluar 1.34s especiar 0.28s cruzar 0.36s mutar 0.000s
+gen  180 | train  69.2% | test  63.0% | evaluar 1.35s especiar 0.28s cruzar 0.36s mutar 0.000s
+gen  190 | train  69.7% | test  61.9% | evaluar 1.40s especiar 0.29s cruzar 0.36s mutar 0.000s
+gen  199 | train  69.7% | test  61.9% | evaluar 1.42s especiar 0.29s cruzar 0.37s mutar 0.000s
+
+Tiempo total 363.7s: evaluar 64% | especiar 16% | cruzar 20% | mutar 0%
+
+Ejemplos con el mejor individuo:
+                                
+                                
+                                
+          ::--..                
+          ****%%%%%%%%%%++      
+                ......++++      
+                    ..@@..      
+                    **==        
+                  ..%%..        
+                  ##==          
+                ==##            
+              ..@@..            
+              **@@..            
+              --::              
+    real: 7   NEAT dice: 7
+
+                                
+              ::====..          
+            ++@@%%%%++          
+          ..@@::  ++**          
+                ..%%++          
+                **%%..          
+              ==@@::            
+            ..%%++              
+            ++%%..              
+            @@++        ..----  
+            %%@@@@@@##%%@@%%##::
+            ..::--====::        
+                                
+                                
+    real: 2   NEAT dice: 6
+
+                                
+                                
+                    **::        
+                    ##          
+                  --++          
+                  **==          
+                ..##..          
+                --##            
+                **--            
+                %%::            
+              ::@@..            
+              ==++              
+                                
+                                
+    real: 1   NEAT dice: 1
+
+Registro por generacion en mnist_neat_log.csv; poblacion guardada en mnist_neat_backup.txt
+PROFILE: interrupts/evictions/bytes = 36324/151/11552
