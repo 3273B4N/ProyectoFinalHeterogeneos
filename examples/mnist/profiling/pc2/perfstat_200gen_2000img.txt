@@ -1,0 +1,15 @@
+
+ Performance counter stats for '../build/MnistNEAT 200 2000 150 42' (5 runs):
+
+                 0      context-switches:u               #      0.0 cs/sec  cs_per_second     
+                 0      cpu-migrations:u                 #      0.0 migrations/sec  migrations_per_second
+            18,341      page-faults:u                    #     50.4 faults/sec  page_faults_per_second  ( +-  0.00% )
+        364,062.98 msec task-clock:u                     #      1.0 CPUs  CPUs_utilized         ( +-  0.13% )
+       598,735,814      branch-misses:u                  #      0.0 %  branch_miss_rate         ( +-  0.42% )  (50.00%)
+ 1,264,709,256,494      branches:u                       #   3473.9 M/sec  branch_frequency     ( +-  0.00% )  (49.99%)
+ 1,395,975,470,339      cpu-cycles:u                     #      3.8 GHz  cycles_frequency       ( +-  0.09% )  (66.67%)
+ 6,241,814,742,203      instructions:u                   #      4.5 instructions  insn_per_cycle  ( +-  0.00% )  (50.00%)
+    11,957,423,752      stalled-cycles-frontend:u        #     0.01 frontend_cycles_idle        ( +-  5.82% )  (50.01%)
+
+     364.149649136 +- 0.455960548 seconds time elapsed  ( +-  0.13% )
+

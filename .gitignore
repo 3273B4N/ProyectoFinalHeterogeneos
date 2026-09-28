@@ -5,3 +5,4 @@ examples/snake/build/
 .deps-cache/
 libneat.a
 lib/libneat.a
+build/
