@@ -83,3 +83,5 @@ Se paralelizó `runNetwork`, ya que al ser la fase más costosa (59%), era la pr
 ## Resultado 
 
 Con las dos optimizaciones aplicadas, el tiempo total (200 gen / 2000 img / pob 150, semilla 42, medido 5 veces con `perf stat`) bajó de **193.95 s ± 1.06 s** a **90.91 s ± 5.10 s**, una mejora de **~2.13×**.
+
+[![Demostración Prototipo en CPU](https://img.youtube.com/vi/gNGZxSdEBlY/0.jpg)](https://www.youtube.com/watch?v=gNGZxSdEBlY)
