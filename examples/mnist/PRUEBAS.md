@@ -52,15 +52,3 @@ for v in sin_bias sin_elite; do for s in 1 2 3 4 5; do echo -n "$v semilla $s: "
 
 Referencia: sin bias 54.0 % ± 2.7, sin élite 56.9 % ± 2.8.
 
-## 7. Carga para perfilado
-
-```bash
-./build/MnistNEAT 20 5000 150 42 | grep -E "gen |Tiempo"
-```
-
-Con 5000 imágenes la evaluación ocupa la mayor parte del tiempo.
-
-## Notas
-
-- Con la misma semilla los resultados son idénticos en la misma máquina.
-- Los tiempos en la Jetson Nano son mayores que en una PC.
