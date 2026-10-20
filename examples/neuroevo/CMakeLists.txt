@@ -60,3 +60,23 @@ target_compile_options(neuroevo_tests PRIVATE -fno-pie)
 # Para agregar un evaluador GPU/FPGA: ver README.md. Ejemplo (Persona B):
 #   option(NEUROEVO_WITH_CUDA "Evaluador CUDA" OFF)
 #   if(NEUROEVO_WITH_CUDA) ... target_sources(neuroevo PRIVATE src/gpu_evaluator.cu) ... endif()
+
+# Prueba aislada del empaquetador CSR (Persona B)
+add_executable(test_packing tests/test_packing.cpp src/packing.cpp)
+target_include_directories(test_packing PRIVATE
+  ${CMAKE_CURRENT_SOURCE_DIR}/include
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../include)
+target_link_libraries(test_packing PRIVATE neat sfml-graphics sfml-window sfml-system OpenMP::OpenMP_CXX)
+target_link_options(test_packing PRIVATE -no-pie)
+target_compile_options(test_packing PRIVATE -fno-pie)
+
+
+option(NEUROEVO_WITH_CUDA "Evaluador CUDA" OFF)
+if(NEUROEVO_WITH_CUDA)
+    target_sources(neuroevo PRIVATE src/gpu_evaluator.cpp src/packing.cpp) 
+    target_compile_definitions(neuroevo PRIVATE NEUROEVO_WITH_CUDA)
+    target_sources(neuroevo_tests PRIVATE src/gpu_evaluator.cpp src/packing.cpp)
+    target_compile_definitions(neuroevo_tests PRIVATE NEUROEVO_WITH_CUDA)
+    
+    
+    endif()
