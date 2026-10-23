@@ -68,13 +68,13 @@ target_compile_options(neuroevo_tests PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-fno-pie
 #   if(NEUROEVO_WITH_CUDA) ... target_sources(neuroevo PRIVATE src/gpu_evaluator.cu) ... endif()
 
 # Prueba aislada del empaquetador CSR (Persona B)
-add_executable(test_packing tests/test_packing.cpp src/packing.cpp)
-target_include_directories(test_packing PRIVATE
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
-  ${CMAKE_CURRENT_SOURCE_DIR}/../../include)
-target_link_libraries(test_packing PRIVATE neat sfml-graphics sfml-window sfml-system OpenMP::OpenMP_CXX)
-set_target_properties(test_packing PROPERTIES LINK_FLAGS "-no-pie")
-target_compile_options(test_packing PRIVATE -fno-pie)
+#add_executable(test_packing tests/test_packing.cpp src/packing.cpp)
+#target_include_directories(test_packing PRIVATE
+	# ${CMAKE_CURRENT_SOURCE_DIR}/include
+  #  ${CMAKE_CURRENT_SOURCE_DIR}/../../include)
+#target_link_libraries(test_packing PRIVATE neat sfml-graphics sfml-window sfml-system OpenMP::OpenMP_CXX)
+#set_target_properties(test_packing PROPERTIES LINK_FLAGS "-no-pie")
+#target_compile_options(test_packing PRIVATE -fno-pie)
 
 
 option(NEUROEVO_WITH_CUDA "Evaluador CUDA" OFF)

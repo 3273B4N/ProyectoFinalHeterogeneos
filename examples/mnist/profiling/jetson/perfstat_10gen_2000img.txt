@@ -1,0 +1,14 @@
+
+ Performance counter stats for '../build/MnistNEAT 10 2000 150 42' (2 runs):
+
+     135118,890646      task-clock (msec)         #    1,000 CPUs utilized            ( +-  0,09% )
+             1 208      context-switches          #    0,009 K/sec                    ( +-  7,07% )
+                 0      cpu-migrations            #    0,000 K/sec                    ( +-100,00% )
+            19 744      page-faults               #    0,146 K/sec                    ( +-  1,28% )
+   128 224 055 624      cycles                    #    0,949 GHz                      ( +-  0,10% )
+   241 290 505 625      instructions              #    1,88  insn per cycle           ( +-  0,00% )
+   <not supported>      branches                                                    
+        40 542 769      branch-misses                                                 ( +-  0,27% )
+
+     135,174610836 seconds time elapsed                                          ( +-  0,09% )
+

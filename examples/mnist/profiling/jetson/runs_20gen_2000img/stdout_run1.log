@@ -1,0 +1,6 @@
+Cargando MNIST desde /home/el5859/esteb/ProyectoFinalHeterogeneos/examples/mnist/mnist ...
+Poblacion 150 | 2000 imagenes de entrenamiento | 1000 de prueba | 20 generaciones | semilla 42
+Ajustes: FIX_BIAS=1 PROTECT_ELITE=1 TEMPLATE_PARAMS=0
+
+gen    0 | train  18.1% | test  17.5% | evaluar 4.34s especiar 2.10s cruzar 2.33s mutar 0.003s
+gen   10 | train  35.8% | test  35.5% | evaluar 4.53s especiar 2.14s cruzar 2.33s mutar 0.003s
