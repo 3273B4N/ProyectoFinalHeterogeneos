@@ -20,7 +20,7 @@ public:
         return {"pack", "h2d", "kernel", "d2h"};
     }
     
-    void init(const Task& task, int popsize, AtageTimers& timers) override;
+    void init(const Task& task, int popsize, StageTimers& timers) override;
     void evaluate(neat::Population& pop, const Task& task, const Batch& batch) override;
     ~GpuEvaluator() override;
     
