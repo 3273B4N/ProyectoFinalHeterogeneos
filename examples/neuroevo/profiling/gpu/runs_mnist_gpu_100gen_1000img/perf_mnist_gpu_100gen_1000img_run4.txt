@@ -1,0 +1,333 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 474K of event 'cycles:ppp'
+# Event count (approx.): 447518568519
+#
+# Overhead  Symbol                                                                                                                                                                                                      
+# ........  ............................................................................................................................................................................................................
+#
+    53.07%  [.] neat::Population::crossover(bool)
+    44.54%  [.] neat::Population::compareGenomes(int, int, float, float, float)
+     0.65%  [.] __random
+     0.20%  [.] neuroevo::(anonymous namespace)::MnistTask::fitness(neuroevo::Batch const&, float const*) const
+     0.19%  [.] sf::Window::close()@plt
+     0.13%  [.] neuroevo::packPopulation(neat::Population const&)
+     0.12%  [.] std::vector<neat::Connection, std::allocator<neat::Connection> >::operator=(std::vector<neat::Connection, std::allocator<neat::Connection> > const&)
+     0.10%  [.] neat::Genome::Genome(int, int, int, float, std::vector<std::vector<int, std::allocator<int> >, std::allocator<std::vector<int, std::allocator<int> > > >*, int*, float)
+     0.10%  [.] void mnist::read_mnist_image_file<std::vector, std::vector<unsigned char, std::allocator<unsigned char> >, mnist::read_dataset_direct<std::vector, std::vector<unsigned char, std::allocator<unsigned char> >, unsigned char>(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unsigned long, unsigned long)::{lambda()#1}>(std::vector<std::vector<unsigned char, std::allocator<unsigned char> > >&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unsigned long, mnist::read_dataset_direct<std::vector, std::vector<unsigned char, std::allocator<unsigned char> >, unsigned char>(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unsigned long, unsigned long)::{lambda()#1})
+     0.07%  [.] neat::Genome::runNetwork(float (*)(float))
+     0.06%  [.] __random_r
+     0.06%  [.] neuroevo::GpuEvaluator::evaluate(neat::Population&, neuroevo::Task const&, neuroevo::Batch const&)
+     0.05%  [.] rand_r
+     0.04%  [.] __GI___printf_fp_l
+     0.03%  [k] __pi___clean_dcache_area_poc
+     0.02%  [k] el0_da
+     0.02%  [.] __memcpy_generic
+     0.02%  [k] _raw_spin_unlock_irqrestore
+     0.02%  [k] __softirqentry_text_start
+     0.02%  [.] _int_malloc
+     0.02%  [.] __GI___memset_generic
+     0.02%  [.] std::basic_ostream<char, std::char_traits<char> >::sentry::sentry(std::basic_ostream<char, std::char_traits<char> >&)
+     0.02%  [.] std::basic_ostream<char, std::char_traits<char> >& std::__ostream_insert<char, std::char_traits<char> >(std::basic_ostream<char, std::char_traits<char> >&, char const*, long)
+     0.02%  [.] void mnist::read_mnist_image_file<std::vector, std::vector<unsigned char, std::allocator<unsigned char> >, mnist::read_dataset_direct<std::vector, std::vector<unsigned char, std::allocator<unsigned char> >, unsigned char>(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unsigned long, unsigned long)::{lambda()#2}>(std::vector<std::vector<unsigned char, std::allocator<unsigned char> > >&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unsigned long, mnist::read_dataset_direct<std::vector, std::vector<unsigned char, std::allocator<unsigned char> >, unsigned char>(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unsigned long, unsigned long)::{lambda()#2})
+     0.01%  [.] std::basic_ostream<char, std::char_traits<char> >::sentry::~sentry()
+     0.01%  [.] _int_free
+     0.01%  [.] neat::Genome::mutateWeights(float, float)
+     0.01%  [.] vfprintf
+     0.01%  [.] malloc
+     0.01%  [.] std::ostreambuf_iterator<char, std::char_traits<char> > std::num_put<char, std::ostreambuf_iterator<char, std::char_traits<char> > >::_M_insert_int<long>(std::ostreambuf_iterator<char, std::char_traits<char> >, std::ios_base&, char, long) const
+     0.01%  [.] rand
+     0.01%  [.] hack_digit
+     0.01%  [.] memset@plt
+     0.01%  [k] handle_mm_fault
+     0.01%  [k] __pi___dma_flush_area
+     0.01%  [.] std::vector<neat::Node, std::allocator<neat::Node> >::operator=(std::vector<neat::Node, std::allocator<neat::Node> > const&)
+     0.01%  [k] ptep_set_access_flags
+     0.01%  [.] std::basic_filebuf<char, std::char_traits<char> >::xsputn(char const*, long)
+     0.01%  [.] std::basic_ostream<char, std::char_traits<char> >& std::basic_ostream<char, std::char_traits<char> >::_M_insert<bool>(bool)
+     0.01%  [.] __strchrnul
+     0.01%  [.] std::basic_streambuf<char, std::char_traits<char> >::xsputn(char const*, long)
+     0.01%  [.] 0x0000000000108364
+     0.01%  [.] std::basic_ostream<char, std::char_traits<char> >& std::basic_ostream<char, std::char_traits<char> >::_M_insert<long>(long)
+     0.01%  [.] void std::vector<neat::Node, std::allocator<neat::Node> >::emplace_back<neat::Node>(neat::Node&&)
+     0.01%  [k] inner_cache_maint
+     0.01%  [.] neat::Population::save(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >)
+     0.01%  [k] __arch_copy_to_user
+     0.01%  [k] clear_page
+     0.01%  [.] __mpn_mul_1
+     0.01%  [.] std::ostreambuf_iterator<char, std::char_traits<char> > std::num_put<char, std::ostreambuf_iterator<char, std::char_traits<char> > >::_M_insert_float<double>(std::ostreambuf_iterator<char, std::char_traits<char> >, std::ios_base&, char, char, double) const
+     0.00%  [k] _raw_spin_unlock
+     0.00%  [k] __lock_text_start
+     0.00%  [.] cfree@GLIBC_2.17
+     0.00%  [.] __cxxabiv1::__vmi_class_type_info::__do_dyncast(long, __cxxabiv1::__class_type_info::__sub_kind, __cxxabiv1::__class_type_info const*, void const*, __cxxabiv1::__class_type_info const*, void const*, __cxxabiv1::__class_type_info::__dyncast_result&) const
+     0.00%  [k] _raw_spin_unlock_irq
+     0.00%  [.] std::codecvt<wchar_t, char, __mbstate_t> const& std::use_facet<std::codecvt<wchar_t, char, __mbstate_t> >(std::locale const&)@plt
+     0.00%  [.] void std::vector<neat::Genome, std::allocator<neat::Genome> >::_M_realloc_insert<neat::Genome const&>(__gnu_cxx::__normal_iterator<neat::Genome*, std::vector<neat::Genome, std::allocator<neat::Genome> > >, neat::Genome const&)
+     0.00%  [.] std::num_put<char, std::ostreambuf_iterator<char, std::char_traits<char> > >::do_put(std::ostreambuf_iterator<char, std::char_traits<char> >, std::ios_base&, char, bool) const
+     0.00%  [k] nvmap_fixup_prot
+     0.00%  [.] std::thread::_M_start_thread(std::shared_ptr<std::thread::_Impl_base>, void (*)())@plt
+     0.00%  [k] __arch_copy_from_user
+     0.00%  [k] do_page_fault
+     0.00%  [.] neat::Genome::addConnection(std::vector<std::vector<int, std::allocator<int> >, std::allocator<std::vector<int, std::allocator<int> > > >*, int*, int, bool, float)
+     0.00%  [k] vmacache_find
+     0.00%  [.] std::codecvt<char, char, __mbstate_t>::do_always_noconv() const
+     0.00%  [.] std::basic_ostream<char, std::char_traits<char> >& std::basic_ostream<char, std::char_traits<char> >::_M_insert<double>(double)
+     0.00%  [k] change_protection
+     0.00%  [.] __dynamic_cast
+     0.00%  [.] std::locale::id::_M_id() const
+     0.00%  [.] std::ctype<char> const& std::use_facet<std::ctype<char> >(std::locale const&)
+     0.00%  [.] neat::Genome::loadInputs(float*)
+     0.00%  [.] std::ostreambuf_iterator<char, std::char_traits<char> > std::money_put<char, std::ostreambuf_iterator<char, std::char_traits<char> > >::_M_insert<true>(std::ostreambuf_iterator<char, std::char_traits<char> >, std::ios_base&, char, std::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@plt
+     0.00%  [k] __ll_sc___cmpxchg_case_acq_8
+     0.00%  [k] __ll_sc_atomic_add_return_release
+     0.00%  [.] _IO_vsnprintf
+     0.00%  [k] __delay
+     0.00%  [.] __printf_fp
+     0.00%  [.] _IO_old_init
+     0.00%  [.] 0x000000000010866c
+     0.00%  [k] __ll_sc_atomic_add
+     0.00%  [k] __cpu_clear_user_page
+     0.00%  [.] expf@@GLIBC_2.27
+     0.00%  [.] _IO_no_init
+     0.00%  [.] 0x0000000000108660
+     0.00%  [.] neat::Genome::getInnovId(std::vector<std::vector<int, std::allocator<int> >, std::allocator<std::vector<int, std::allocator<int> > > >*, int*, int, int) [clone .constprop.128]
+     0.00%  [.] std::ostreambuf_iterator<char, std::char_traits<char> > std::__cxx11::money_put<char, std::ostreambuf_iterator<char, std::char_traits<char> > >::_M_insert<true>(std::ostreambuf_iterator<char, std::char_traits<char> >, std::ios_base&, char, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) const@plt
+     0.00%  [k] do_mem_abort
+     0.00%  [k] find_get_entry
+     0.00%  [.] strcmp
+     0.00%  [k] __ll_sc_atomic_sub_return_acquire
+     0.00%  [k] free_hot_cold_page
+     0.00%  [k] mutex_unlock
+     0.00%  [.] neat::Node::Node(int, int)
+     0.00%  [.] __mpn_lshift
+     0.00%  [.] neat::Genome::addNode(std::vector<std::vector<int, std::allocator<int> >, std::allocator<std::vector<int, std::allocator<int> > > >*, int*, int, bool) [clone .part.117]
+     0.00%  [.] 0x0000000000108688
+     0.00%  [.] __uselocale
+     0.00%  [.] void std::vector<int, std::allocator<int> >::_M_realloc_insert<int const&>(__gnu_cxx::__normal_iterator<int*, std::vector<int, std::allocator<int> > >, int const&)
+     0.00%  [k] __rcu_read_unlock
+     0.00%  [.] operator new(unsigned long)
+     0.00%  [.] std::locale::_S_normalize_category(int)@plt
+     0.00%  [.] std::__basic_file<char>::~__basic_file()@plt
+     0.00%  [k] nvmap_reserve_pages
+     0.00%  [k] __nvmap_do_cache_maint
+     0.00%  [k] __ll_sc_atomic64_sub_return_release
+     0.00%  [k] __ll_sc_atomic_sub_return
+     0.00%  [k] mprotect_fixup
+     0.00%  [k] mem_cgroup_from_task
+     0.00%  [.] std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::reserve(unsigned long)@plt
+     0.00%  [.] std::locale::facet::_S_get_c_locale()
+     0.00%  [.] __mpn_rshift
+     0.00%  [.] __GI_strlen
+     0.00%  [.] strcmp
+     0.00%  [.] std::ctype<char>::_M_widen_init() const@plt
+     0.00%  [.] 0x000000000010868c
+     0.00%  [.] void std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_construct<__gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >(__gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, __gnu_cxx::__normal_iterator<char*, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > >, std::forward_iterator_tag)@plt
+     0.00%  [k] el0_svc_naked
+     0.00%  [k] run_timer_softirq
+     0.00%  [.] do_lookup_x
+     0.00%  [k] uncharge_page
+     0.00%  [k] __dec_node_state
+     0.00%  [k] up_read
+     0.00%  [k] down_read_trylock
+     0.00%  [.] 0x0000000000108694
+     0.00%  [.] _IO_str_init_static_internal
+     0.00%  [.] __mpn_mul
+     0.00%  [.] _IO_setb
+     0.00%  [.] sf::Font::loadFromFile(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)@plt
+     0.00%  [k] try_charge
+     0.00%  [.] _IO_default_xsputn
+     0.00%  [.] 0x0000000000108684
+     0.00%  [.] neuroevo::(anonymous namespace)::makeBatch(std::vector<std::vector<unsigned char, std::allocator<unsigned char> >, std::allocator<std::vector<unsigned char, std::allocator<unsigned char> > > > const&, std::vector<unsigned char, std::allocator<unsigned char> > const&, unsigned long)
+     0.00%  [k] iov_iter_fault_in_readable
+     0.00%  [.] neuroevo::StageTimers::Scope::~Scope()
+     0.00%  [k] host1x_sync_readl
+     0.00%  [.] __cxa_vec_cleanup@plt
+     0.00%  [.] bool std::has_facet<std::ctype<char> >(std::locale const&)@plt
+     0.00%  [.] __pthread_once
+     0.00%  [k] get_mem_cgroup_from_mm
+     0.00%  [.] __libc_calloc
+     0.00%  [k] lock_page_memcg
+     0.00%  [k] alloc_set_pte
+     0.00%  [k] lockref_mark_dead
+     0.00%  [k] __check_object_size
+     0.00%  [k] vm_stat_account
+     0.00%  [k] __nvgpu_readl
+     0.00%  [k] __ll_sc_atomic_add_return
+     0.00%  [k] rtl8168_csi_other_fun_read.isra.15
+     0.00%  [.] omp_get_thread_num
+     0.00%  [.] operator delete(void*)
+     0.00%  [.] main
+     0.00%  [.] 0x000000000010869c
+     0.00%  [.] 0x0000000000102c88
+     0.00%  [k] ext4_mark_iloc_dirty
+     0.00%  [k] lru_cache_add
+     0.00%  [.] __mpn_extract_double
+     0.00%  [.] std::ctype_byname<wchar_t>::ctype_byname(char const*, unsigned long)@plt
+     0.00%  [.] std::num_put<char, std::ostreambuf_iterator<char, std::char_traits<char> > >::do_put(std::ostreambuf_iterator<char, std::char_traits<char> >, std::ios_base&, char, double) const
+     0.00%  [.] 0x0000000000108348
+     0.00%  [.] ungetwc@plt
+     0.00%  [k] get_page_from_freelist
+     0.00%  [.] std::strstreambuf::str()@plt
+     0.00%  [k] balance_dirty_pages_ratelimited
+     0.00%  [.] 0x0000000000108338
+     0.00%  [k] __fget
+     0.00%  [k] memset
+     0.00%  [.] 0x0000000000102cdc
+     0.00%  [.] void std::vector<neat::Connection, std::allocator<neat::Connection> >::_M_realloc_insert<neat::Connection>(__gnu_cxx::__normal_iterator<neat::Connection*, std::vector<neat::Connection, std::allocator<neat::Connection> > >, neat::Connection&&)
+     0.00%  [k] mem_cgroup_commit_charge
+     0.00%  [k] nvmap_cache_maint_phys_range
+     0.00%  [.] __libc_alloca_cutoff
+     0.00%  [k] probe_kernel_read
+     0.00%  [.] 0x0000000000108370
+     0.00%  [k] do_translation_fault
+     0.00%  [k] clear_bit
+     0.00%  [k] memblock_is_map_memory
+     0.00%  [k] gk20a_channel_ioctl
+     0.00%  [k] nvmap_ioctl
+     0.00%  [.] __errno_location
+     0.00%  [k] find_vma
+     0.00%  [k] __ll_sc_atomic_sub
+     0.00%  [k] __slab_alloc.isra.27.constprop.33
+     0.00%  [.] std::basic_ostream<char, std::char_traits<char> >::operator<<(int)
+     0.00%  [.] putc@plt
+     0.00%  [.] 0x00000000000dc7e4
+     0.00%  [k] pagecache_get_page
+     0.00%  [.] 0x000000000026daf0
+     0.00%  [.] 0x0000000000250480
+     0.00%  [k] nvhost_get_syncpt_owner
+     0.00%  [.] __pthread_disable_asynccancel
+     0.00%  [.] 0x00000000001fc978
+     0.00%  [.] 0x0000000000158c50
+     0.00%  [.] neat::Population::speciate(int, int, float, float, float, float)
+     0.00%  [.] 0x00000000000d1854
+     0.00%  [.] std::vector<neat::Genome, std::allocator<neat::Genome> >::operator=(std::vector<neat::Genome, std::allocator<neat::Genome> > const&)
+     0.00%  [.] __pthread_mutex_lock_full
+     0.00%  [.] 0x00000000000004a8
+     0.00%  [k] add_transaction_credits
+     0.00%  [.] 0x0000000000180658
+     0.00%  [.] 0x00000000000dc7b8
+     0.00%  [.] neuroevo::(anonymous namespace)::MnistTask::accuracy(neuroevo::Batch const&, float const*) const
+     0.00%  [.] std::__cxx11::collate<char>::_M_transform(char*, char const*, unsigned long) const@plt
+     0.00%  [k] ip6_pol_route
+     0.00%  [.] std::__num_base::_S_format_float(std::ios_base const&, char*, char)
+     0.00%  [.] 0x00000000000dc7e0
+     0.00%  [k] iov_iter_advance
+     0.00%  [.] 0x0000000000102c90
+     0.00%  [.] neat::Genome::getOutputs(float*)
+     0.00%  [k] is_vmalloc_or_module_addr
+     0.00%  [k] down_read
+     0.00%  [.] 0x00000000000dc7cc
+     0.00%  [k] __mark_inode_dirty
+     0.00%  [k] try_to_free_buffers
+     0.00%  [.] 0x00000000000dc860
+     0.00%  [.] __clock_gettime
+     0.00%  [k] __mod_node_page_state
+     0.00%  [k] _raw_read_lock
+     0.00%  [.] __strxfrm_l@plt
+     0.00%  [k] iommu_map
+     0.00%  [.] __GI___fileno
+     0.00%  [k] kmem_cache_alloc
+     0.00%  [k] __block_write_begin_int
+     0.00%  [k] kmem_cache_free
+     0.00%  [k] drop_buffers
+     0.00%  [k] bad_range
+     0.00%  [.] 0x0000000000178c40
+     0.00%  [k] pfn_valid
+     0.00%  [.] 0x00000000000dc834
+     0.00%  [.] 0x00000000000dc7d8
+     0.00%  [k] do_iter_readv_writev
+     0.00%  [.] void mnist::read_mnist_label_file<std::vector, unsigned char>(std::vector<unsigned char>&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unsigned long)
+     0.00%  [k] uncharge_batch
+     0.00%  [.] 0x00000000000dc7f0
+     0.00%  [k] create_empty_buffers
+     0.00%  [.] std::__cxx11::time_get<wchar_t, std::istreambuf_iterator<wchar_t, std::char_traits<wchar_t> > >::_M_extract_name(std::istreambuf_iterator<wchar_t, std::char_traits<wchar_t> >, std::istreambuf_iterator<wchar_t, std::char_traits<wchar_t> >, int&, wchar_t const**, unsigned long, std::ios_base&, std::_Ios_Iostate&) const@plt
+     0.00%  [k] __ll_sc___cmpxchg_double
+     0.00%  [.] std::basic_istream<char, std::char_traits<char> >::tellg()@plt
+     0.00%  [.] 0x00000000000dc86c
+     0.00%  [.] __GI___writev
+     0.00%  [k] trace_write_pushbuffers
+     0.00%  [k] iommu_dma_map_page
+     0.00%  [k] fput
+     0.00%  [.] mempcpy
+     0.00%  [k] 0x000000000005b270
+     0.00%  [.] 0x00000000002caef0
+     0.00%  [k] recalc_bh_state
+     0.00%  [.] 0x0000000000286bc0
+     0.00%  [.] 0x00000000000dc7c0
+     0.00%  [.] 0x0000000000284468
+     0.00%  [.] neat::Genome::mutate(std::vector<std::vector<int, std::allocator<int> >, std::allocator<std::vector<int, std::allocator<int> > > >*, int*, bool, float, float, float, float, int, float, float, int)
+     0.00%  [.] neat::Connection::Connection(int, int, int, float, bool, bool)
+     0.00%  [.] __GI_memchr
+     0.00%  [k] strncpy_from_user
+     0.00%  [k] mem_cgroup_try_charge
+     0.00%  [.] 0x0000000000248d08
+     0.00%  [k] __radix_tree_lookup
+     0.00%  [.] gpuEvaluatorCheckCuda(cudaError)
+     0.00%  [.] cudart::cudaApiDeviceSynchronize()
+     0.00%  [.] 0x0000000000169e7c
+     0.00%  [.] 0x00000000001fb660
+     0.00%  [.] cudart::contextState::prepareToLaunchFunction(CUfunc_st**, cudart::configData const*, void const*)
+     0.00%  [k] vma_compute_subtree_gap
+     0.00%  [k] t20_intr_set_syncpt_threshold
+     0.00%  [k] __schedule
+     0.00%  [k] do_vfs_ioctl
+     0.00%  [.] 0x00000000001fb978
+     0.00%  [k] nvmap_ioctl_cache_maint_list
+     0.00%  [k] __fsnotify_parent
+     0.00%  [k] __nvhost_intr_register_notifier
+     0.00%  [k] ext4_da_invalidatepage
+     0.00%  [.] _dl_relocate_object
+     0.00%  [.] 0x00000000002858c8
+     0.00%  [k] do_anonymous_page
+     0.00%  [k] run_handlers
+     0.00%  [.] 0x00000000002e80d0
+     0.00%  [k] nvmap_page_pool_fill_lots
+     0.00%  [k] __ll_sc_atomic64_sub_return
+     0.00%  [k] rebalance_domains
+     0.00%  [k] clear_page_dirty_for_io
+     0.00%  [k] is_vma_temporary_stack
+     0.00%  [.] sf::Text::setFont(sf::Font const&)@plt
+     0.00%  [k] __ll_sc___cmpxchg_case_mb_4
+     0.00%  [k] note_gp_changes
+     0.00%  [k] find_get_pages_tag
+     0.00%  [.] 0x00000000000dc7dc
+     0.00%  [.] std::__cxx11::messages<char>::messages(unsigned long)@plt
+     0.00%  [k] nvhost_syncpt_wait_timeout
+     0.00%  [.] 0x000000000026ddd0
+     0.00%  [k] perf_iterate_ctx.constprop.60
+     0.00%  [.] 0x000000000020f5e8
+     0.00%  [k] 0x000000000007aa6c
+     0.00%  [k] ipv6_gro_receive
+     0.00%  [.] 0x000000000001a53c
+     0.00%  [.] 0x000000000024795c
+     0.00%  [.] elf64_symbol_name
+     0.00%  [.] 0x00000000002e6668
+     0.00%  [k] alloc_vmap_area.isra.9
+     0.00%  [.] 0x000000000001aa58
+     0.00%  [.] sprintf
+     0.00%  [.] 0x000000000011bac8
+     0.00%  [.] 0x00000000001532f8
+     0.00%  [.] __sched_yield
+     0.00%  [.] elf64_section_name
+     0.00%  [.] 0x00000000000f7208
+     0.00%  [k] nvmap_page_pool_alloc_lots_bp
+     0.00%  [k] test_and_set_bit
+     0.00%  [k] rcu_process_callbacks
+     0.00%  [.] 0x00000000002e4db0
+     0.00%  [k] nvgpu_aperture_mask_raw
+     0.00%  [.] __pthread_mutex_lock
+     0.00%  [k] perf_event_mmap
+     0.00%  [.] 0x00000000000f7310
+     0.00%  [.] 0x00000000000fd2ec
+     0.00%  [k] ret_to_user
+     0.00%  [.] 0x00000000002e5514
+     0.00%  [k] nvgpu_vm_unmap_system
+     0.00%  [k] nvgpu_mem_wr32
+     0.00%  [k] _extract_crng.constprop.21
+     0.00%  [k] strrchr
+     0.00%  [k] perf_event_exec
+
+

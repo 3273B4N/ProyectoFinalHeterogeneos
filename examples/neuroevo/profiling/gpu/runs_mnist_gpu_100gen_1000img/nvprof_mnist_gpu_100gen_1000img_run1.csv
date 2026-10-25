@@ -1,0 +1,18 @@
+==31615== NVPROF is profiling process 31615, command: ../build/neuroevo --task mnist --eval gpu --gens 100 --train 1000 --pop 150 --seed 42
+==31615== Warning: Unified Memory Profiling is not supported on the underlying platform. System requirements for unified memory can be found at: http://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#um-requirements
+==31615== Profiling application: ../build/neuroevo --task mnist --eval gpu --gens 100 --train 1000 --pop 150 --seed 42
+==31615== Profiling result:
+"Type","Time(%)","Time","Calls","Avg","Min","Max","Name"
+,%,ms,,ms,ms,ms,
+"GPU activities",100.000000,75781.667804,100,757.816678,706.938006,780.806020,"evaluateKernel(int const *, int const *, int const *, int const *, int const *, float const *, float const *, float*, int, int, int, int)"
+"API calls",99.155574,75816.153327,100,758.161533,707.315703,781.153583,"cudaDeviceSynchronize"
+"API calls",0.612997,468.708460,8,58.588557,0.143077,454.672322,"cudaMallocManaged"
+"API calls",0.226219,172.970945,100,1.729709,1.637329,6.753998,"cudaLaunchKernel"
+"API calls",0.004691,3.586703,8,0.448337,0.146462,1.115392,"cudaFree"
+"API calls",0.000262,0.200317,100,0.002003,0.001615,0.005989,"cudaGetLastError"
+"API calls",0.000219,0.167399,97,0.001725,0.000989,0.034792,"cuDeviceGetAttribute"
+"API calls",0.000016,0.012344,1,0.012344,0.012344,0.012344,"cuDeviceTotalMem"
+"API calls",0.000011,0.008594,3,0.002864,0.002136,0.003958,"cuDeviceGetCount"
+"API calls",0.000007,0.005000,2,0.002500,0.001771,0.003229,"cuDeviceGet"
+"API calls",0.000003,0.002187,1,0.002187,0.002187,0.002187,"cuDeviceGetName"
+"API calls",0.000002,0.001407,1,0.001407,0.001407,0.001407,"cuDeviceGetUuid"

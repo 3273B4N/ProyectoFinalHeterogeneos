@@ -1,0 +1,64 @@
+Cargando MNIST desde /home/el5859/esteb/ProyectoFinalHeterogeneos/examples/neuroevo/../mnist/mnist ...
+Tarea mnist | evaluador gpu | poblacion 150 | 1000 muestras de entrenamiento | 1000 de prueba | 2 generaciones | semilla 42 | hilos OpenMP 2
+Ajustes: FIX_BIAS=1 PROTECT_ELITE=1 TEMPLATE_PARAMS=0
+
+gen    0 | train  18.9% | test  12.8% | evaluar 0.74s especiar 2.14s cruzar 2.56s mutar 0.003s
+gen    1 | train  20.7% | test  18.5% | evaluar 0.76s especiar 2.10s cruzar 2.56s mutar 0.003s
+
+Tiempo total 10.9s: evaluar 14% | especiar 39% | cruzar 47% | mutar 0%
+(+ 0.06s evaluando en prueba, fuera de las etapas anteriores)
+  sub-etapa pack       0.02s (incluida en evaluar)
+  sub-etapa h2d        0.01s (incluida en evaluar)
+  sub-etapa kernel     1.45s (incluida en evaluar)
+  sub-etapa d2h        0.03s (incluida en evaluar)
+
+Ejemplos con el mejor individuo:
+                                
+                                
+                                
+          ::--..                
+          ****%%%%%%%%%%++      
+                ......++++      
+                    ..@@..      
+                    **==        
+                  ..%%..        
+                  ##==          
+                ==##            
+              ..@@..            
+              **@@..            
+              --::              
+    real: 7   NEAT dice: 7
+
+                                
+              ::====..          
+            ++@@%%%%++          
+          ..@@::  ++**          
+                ..%%++          
+                **%%..          
+              ==@@::            
+            ..%%++              
+            ++%%..              
+            @@++        ..----  
+            %%@@@@@@##%%@@%%##::
+            ..::--====::        
+                                
+                                
+    real: 2   NEAT dice: 1
+
+                                
+                                
+                    **::        
+                    ##          
+                  --++          
+                  **==          
+                ..##..          
+                --##            
+                **--            
+                %%::            
+              ::@@..            
+              ==++              
+                                
+                                
+    real: 1   NEAT dice: 1
+
+Registro por generacion en mnist_neat_log.csv; poblacion guardada en ./mnist_neat_backup.txt
