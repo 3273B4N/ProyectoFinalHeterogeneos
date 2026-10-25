@@ -84,3 +84,45 @@
 - `perf` no soporta el contador de `branches` en este SoC (ARM, Jetson Nano), solo `branch-misses`.
 - Jetson no tiene arquitectura híbrida (a diferencia de la laptop con P-core/E-core), así que no hay separación `cpu_core`/`cpu_atom` aquí.
 - `gperftools` reporta en número de muestras (total: 468,140), no en segundos — a diferencia del formato de PC1, este `pprof` no calculó tiempo absoluto por función directamente.
+
+## Resultados de profiling — Jetson, CPU + OpenMP (2 núcleos)
+
+**Configuración:** 100 generaciones / 1000 imágenes / población 150 / semilla 42 — 5 corridas
+
+| Herramienta | Métrica | Valor | Propio | % propio | % acum. |
+|---|---|---|---|---|---|
+| perf stat | Tiempo total (real, wall-clock) | 815.36 s ± 0.14% | -- | -- | -- |
+| perf stat | Task-clock | 931.92 s | -- | -- | -- |
+| perf stat | CPUs utilizadas (promedio) | 1.143 | -- | -- | -- |
+| perf stat | Instrucciones | 1,843,548,369,253 | -- | -- | -- |
+| perf stat | IPC (instrucciones/ciclo) | 2.09 | -- | -- | -- |
+| perf stat | Ciclos de CPU | 880,554,722,713 (0.945 GHz) | -- | -- | -- |
+| perf stat | Branch misses | 283,205,730 (± 0.30%) | -- | -- | -- |
+| perf stat | Page faults | 15,959 | -- | -- | -- |
+| perf stat | Context switches | 55,279 | -- | -- | -- |
+| perf record/report | `Genome::runNetwork` | -- | -- | 47.33% ± 0.08 | -- |
+| perf record/report | `Population::crossover` | -- | -- | 26.83% ± 0.06 | -- |
+| perf record/report | `Population::compareGenomes` | -- | -- | 22.44% ± 0.05 | -- |
+| gperftools | `Genome::runNetwork` | -- | 211,014 muestras | 46.2% | 46.2% |
+| gperftools | `Population::crossover` | -- | 126,004 muestras | 27.6% | 73.8% |
+| gperftools | `Population::compareGenomes` | -- | 104,975 muestras | 23.0% | 96.7% |
+| gperftools | `Genome::loadInputs` | -- | 5,829 muestras | 1.3% | 98.0% |
+| gperftools | `_init` | -- | 991 muestras | 0.2% | 98.2% |
+| gperftools | `MnistTask::fitness` (inline) | -- | 452 muestras | 0.1% | 98.3% |
+
+**Nota sobre CPUs utilizadas:** con un techo teórico de 2 núcleos, un valor de 1.143 significa que el programa aprovechó en promedio ~57% de la capacidad paralela disponible (1.143/2), consistente con que solo la etapa `evaluar` corre en paralelo.
+
+## Comparación completa — CPU 1 hilo vs. OpenMP (PC1 vs. Jetson)
+
+| Plataforma | Núcleos físicos | Config | Tiempo total | CPUs utilizadas | `runNetwork` | `crossover` | `compareGenomes` |
+|---|---|---|---|---|---|---|---|
+| PC1 (laptop) | 8 | 1 hilo | 96.71 s ± 0.03 s | 1.0 | 38.67% | 38.71% | 20.30% |
+| PC1 (laptop) | 8 | OpenMP | 39.25 s ± 0.36 s | 3.6 | 46.39% | 48.31% | 0.57%* |
+| Jetson Nano | 2 | 1 hilo | 931.99 s ± 0.03% | 1.0 | 48.16% | 27.38% | 22.46% |
+| Jetson Nano | 2 | OpenMP | 815.36 s ± 0.14% | 1.143 | 47.33% | 26.83% | 22.44% |
+
+| Plataforma | Núcleos | Mejora 1 hilo - OpenMP | Mejora teórica (Amdahl, ideal) |
+|---|---|---|---|
+| PC1 (laptop) | 8 | **~2.46×** | hasta 8× |
+| Jetson Nano | 2 | **~1.14×** | hasta 2× |
+
