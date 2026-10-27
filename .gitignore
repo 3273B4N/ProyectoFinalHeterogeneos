@@ -6,3 +6,4 @@ examples/snake/build/
 libneat.a
 lib/libneat.a
 build/
+examples/neuroevo/profiling/gpu/
