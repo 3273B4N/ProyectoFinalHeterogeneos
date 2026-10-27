@@ -4,12 +4,12 @@
 # con la misma semilla. Los tiempos (t_*) cambian entre corridas y no se comparan.
 #
 # Uso: tests/regression.sh [binario_original] [gens] [imagenes] [poblacion] [semilla]
-#   binario_original por defecto: ../mnist/build/MnistNEAT_omp
+#   binario_original por defecto: ../examples/mnist/build/MnistNEAT_omp
 # Se fuerza OMP_NUM_THREADS=1: con varios hilos, Population::crossover agrega los hijos
 # dentro de un `omp critical` y el orden depende del planificador (no es reproducible).
 set -e
 cd "$(dirname "$0")/.."
-BASE=${1:-../mnist/build/MnistNEAT_omp}
+BASE=${1:-../examples/mnist/build/MnistNEAT_omp}
 GENS=${2:-25}; IMGS=${3:-500}; POP=${4:-60}; SEED=${5:-7}
 NEW=./build/neuroevo
 [ -x "$BASE" ] || { echo "No existe $BASE (compile examples/mnist)"; exit 2; }

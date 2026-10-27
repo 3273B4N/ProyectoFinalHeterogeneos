@@ -63,38 +63,3 @@ Propuesta: con la misma semilla, la población evaluada en GPU/FPGA se compara c
 `evaluar` es el tiempo total del evaluador. Los sub-tiempos se declaran en `extraStages()` y salen como columnas
 extra del CSV (`t_h2d`, `t_kernel`, `t_d2h`, ...). Nombres propuestos: `pack`, `h2d`, `kernel`, `d2h`.
 Están **incluidos** en `evaluar`, no se suman aparte.
-
-
-## 6. GpuEvaluator`: decisioones tomadas y contrato con el kernel (persona C)
-
-### Abordando los asuntos pendientes en la sección 2
-
-- Persona B escribe el empaquetador (`include/neuroevo/packing.hpp`,
-  `src/packing.cpp`), el cual ya está implementado y se validó.
-- Tamaños máximos fijos:
-  
-  Margen seleccionado: `maxNodes`/`maxConns` por genoma = 3 veces la media observada en el perfilado de CPU (cerca de 1970 conexiones/genoma en MNIST), que se reserva únicamente una vez, en `init()`. Si una generación sobrepasa el margen, `evaluate()` debe fallar con un mensaje explícito.
-
-### Decisiones de memoria para GPU (Persona B)
-
-- **Memoria unificada** (`cudaMallocManaged`), en lugar de `cudaMalloc` o `cudaMemcpy` explícitos. Razón:
-más fácil de implementar adecuadamente en el tiempo que hay disponible, y la Jetson tiene memoria física compartida entre la CPU y la GPU.
-- **Reserva**: Una sola vez en `init()`, utilizando el margen superior. No se aparta ni libera en cada generación.
-- **Sincronización**: el núcleo es asíncrono; `GpuEvaluator` tiene que obligar `cudaDeviceSynchronize()` (o uno equivalente) antes de cerrar el `Scope("kernel")`, de lo contrario, el tiempo medido será incorrecto.
-
-
-### Firma que el kernel debe exponer (Persona C)
-
-```cpp
-void evaluatePopulationGpu(
-    const int32_t* d_nodeOff, const int32_t* d_connOff,
-    const int32_t* d_layer, const int32_t* d_src,
-    const int32_t* d_dst, const float* d_w,
-    int popSize,
-    const float* d_inputs, int nSamples, int nIn,
-    float* d_outputs,   // salida: [popSize][nSamples][nOut], fila-mayor
-    int nOut
-);
-```
-Ya están todos los punteros `d_*` en la memoria unificada (los asignó y llenó `GpuEvaluator` antes de la llamada); el kernel únicamente realiza cálculos, no reserva ni copia memoria. El cálculo de `fitness` a partir de `outputs` se realiza por parte de `GpuEvaluator` y `CpuEvaluator`, usando la misma función: `task.fitness(batch, outputs)`.
-
