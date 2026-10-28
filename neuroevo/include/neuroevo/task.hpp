@@ -1,6 +1,6 @@
-// Contrato de una TAREA (problema a resolver con neuroevolucion).
+// Interfaz de una tarea (problema a resolver con neuroevolucion).
 // Una tarea NO sabe donde se evalua (CPU/GPU/FPGA): solo entrega datos (Batch) y
-// sabe convertir las salidas de la red en fitness. Ver docs/CONTRATO_LOTE.md.
+// sabe convertir las salidas de la red en fitness. Ver docs/ARQUITECTURA.md.
 #ifndef NEUROEVO_TASK_HPP
 #define NEUROEVO_TASK_HPP
 
