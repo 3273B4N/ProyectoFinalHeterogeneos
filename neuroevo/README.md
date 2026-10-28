@@ -15,7 +15,7 @@ Arquitectura y diagramas: [`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md). Contra
 sudo apt install build-essential cmake git libsfml-dev
 # desde la raiz del repo (una vez): compila lib/libneat.a
 ./unix_launch.sh
-cd examples/neuroevo && ./unix_launch.sh
+cd neuroevo && ./unix_launch.sh
 
 ./build/neuroevo --task mnist --gens 100 --train 1000 --pop 150 --seed 42
 ./build/neuroevo --task xor --seed 1
@@ -35,7 +35,7 @@ Las tres últimas banderas de ablación reemplazan los ejecutables `MnistNEAT_si
 ## Regresión
 
 ```bash
-cd ../mnist && ./unix_launch.sh && cd ../neuroevo     # compila el MNIST original (referencia)
+cd ../examples/mnist && ./unix_launch.sh && cd ../../neuroevo     # compila el MNIST original (referencia)
 ./tests/regression.sh                                 # misma semilla => mismas columnas deterministas
 ./build/neuroevo_tests                                # contrato Task/Evaluator + XOR armado a mano
 ```

@@ -12,7 +12,7 @@
 #include "mnist/mnist_reader.hpp"
 
 #ifndef MNIST_DATA_DIR
-#define MNIST_DATA_DIR "../mnist/mnist"
+#define MNIST_DATA_DIR "../examples/mnist/mnist"
 #endif
 
 using namespace std;
