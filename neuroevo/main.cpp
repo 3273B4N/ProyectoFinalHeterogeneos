@@ -1,4 +1,3 @@
-// neuroevo: driver generico de neuroevolucion NEAT.
 //   --task <mnist|xor>   que problema resolver      (tasks/*.cpp)
 //   --eval <cpu|...>     donde evaluar la poblacion (src/*_evaluator.cpp)
 // Cronometra cada etapa del ciclo evolutivo y escribe un CSV por generacion.

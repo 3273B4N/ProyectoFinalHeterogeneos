@@ -1,0 +1,4 @@
+function                          media   desv.std      n
+Genome::runNetwork                47.33       0.08      5
+Population::compareGenomes        22.44       0.05      5
+Population::crossover             26.83       0.06      5
