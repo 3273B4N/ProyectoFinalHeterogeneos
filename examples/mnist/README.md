@@ -1,5 +1,7 @@
 # MnistNEAT
 
+> Primera versión del clasificador (prototipo en CPU y línea base del perfilado). La versión actual es [`neuroevo`](../../neuroevo/README.md); esta carpeta se mantiene como referencia para la prueba de regresión.
+
 Clasificación de dígitos escritos a mano (MNIST) usando la librería NEAT sin modificarla. Corre por terminal, sin interfaz gráfica.
 
 - Basado en el template del autor (`examples/template/main.cpp`).
@@ -8,9 +10,9 @@ Clasificación de dígitos escritos a mano (MNIST) usando la librería NEAT sin 
 ## Compilar y correr
 
 ```bash
-sudo apt install build-essential cmake git libsfml-dev
+sudo apt install build-essential cmake git libsfml-dev libgoogle-perftools-dev
 
-# Desde NEAT/
+# Desde la raíz del repositorio
 ./unix_launch.sh                 # compila la librería (lib/libneat.a)
 
 cd examples/mnist
@@ -57,8 +59,8 @@ SFML se enlaza porque `genome.hpp` la incluye, aunque el ejemplo no abre ventana
 
 La librería tiene dos errores que el ejemplo corrige sin modificarla:
 
-1. **Bias**: `runNetwork()` usa `sumOutput` del nodo bias, que queda en 0. El ejemplo lo pone en 1 antes de evaluar.
-2. **Élite**: `mutate()` también modifica al mejor individuo. El ejemplo lo guarda antes de mutar y lo restaura después.
+1. Bias: `runNetwork()` usa `sumOutput` del nodo bias, que queda en 0. El ejemplo lo pone en 1 antes de evaluar.
+2. Élite: `mutate()` también modifica al mejor individuo. El ejemplo lo guarda antes de mutar y lo restaura después.
 
 ## Resultados (PC, Ubuntu 24.04)
 
@@ -77,6 +79,20 @@ Con los parámetros del template (60 generaciones, semilla 42) la exactitud se q
 
 Tamaño de población con el mismo número de evaluaciones (3 semillas): 75 × 200 generaciones = 49.1 %, 150 × 100 = 58.3 %, 300 × 50 = 55.2 %.
 
+Para repetir estos resultados:
+
+```bash
+# template contra versión principal (referencia: 19.9 % contra 53.8 % en la generación 59)
+./build/MnistNEAT_template 60 1000 150 42 | grep -E "Ajustes|gen "
+./build/MnistNEAT          60 1000 150 42 | grep -E "Ajustes|gen "
+
+# varias semillas (referencia: 59.2 % ± 1.8)
+for s in 1 2 3 4 5; do echo -n "semilla $s: "; ./build/MnistNEAT 100 1000 150 $s | grep "gen   99"; done
+
+# efecto de las correcciones (referencia: sin bias 54.0 % ± 2.7, sin élite 56.9 % ± 2.8)
+for v in sin_bias sin_elite; do for s in 1 2 3 4 5; do echo -n "$v semilla $s: "; ./build/MnistNEAT_$v 100 1000 150 $s | grep "gen   99"; done; done
+```
+
 ## Archivos generados
 
 - `mnist_neat_log.csv`: exactitud y tiempos por generación.
@@ -85,7 +101,10 @@ Tamaño de población con el mismo número de evaluaciones (3 semillas): 75 × 2
 ## Pruebas
 
 ```bash
-./tests/run_tests.sh --lento
+./tests/run_tests.sh           # pruebas rápidas
+./tests/run_tests.sh --lento   # incluye la prueba de aprendizaje
 ```
 
-Procedimiento completo en `PRUEBAS.md`.
+Resultado esperado: `11 pasan, 0 fallan`. Las pruebas marcadas como "bug conocido" confirman los errores de la librería.
+
+Prueba rápida: `./build/MnistNEAT 2 300 30 1` debe terminar sin errores y crear `mnist_neat_log.csv` y `mnist_neat_backup.txt`.

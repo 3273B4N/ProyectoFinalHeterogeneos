@@ -1,4 +1,4 @@
-// Pruebas del nucleo (sin MNIST): contrato Task/Evaluator y red XOR armada a mano.
+// Pruebas del nucleo (sin MNIST): interfaces Task/Evaluator y red XOR armada a mano.
 // Las mismas comprobaciones sirven para validar los evaluadores de GPU/FPGA contra CPU.
 #include <cmath>
 #include <cstdio>

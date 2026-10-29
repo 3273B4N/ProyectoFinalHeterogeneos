@@ -1,4 +1,4 @@
-// Contrato de un EVALUADOR (donde/como se calcula el fitness de toda la poblacion).
+// Interfaz de un evaluador (donde/como se calcula el fitness de toda la poblacion).
 // CPU (OpenMP), GPU (CUDA) y FPGA (HLS) implementan esta misma interfaz.
 #ifndef NEUROEVO_EVALUATOR_HPP
 #define NEUROEVO_EVALUATOR_HPP

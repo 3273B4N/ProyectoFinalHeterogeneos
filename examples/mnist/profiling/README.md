@@ -1,5 +1,5 @@
 # Perfilado de MNIST - sin optimizar
-Nota: en ambas computadoras se corrieron 5 iteracion del mismo ejecutable, lo cual se hizo para tener una media del perfilado.
+Nota: en ambas computadoras se corrieron 5 iteraciones del mismo ejecutable, lo cual se hizo para tener una media del perfilado.
 ## Nota sobre el script de perfilado:
 Con el fin de facilitar los resultados del perfilado y automatizar este proceso, se generó el script `profiling.sh` con la ayuda de IA para acelerar este proceso
 Instrucciones para correr este script: 
@@ -8,11 +8,13 @@ Instrucciones para correr este script:
 ```bash
 bash profiling.sh <binario> <generaciones> <imagenes> <poblacion> <semilla> <repeticiones> <carpeta_salida>
 ```
+
 ### Ejemplo
 
 ```bash
 bash profiling.sh ../build/MnistNEAT 60 1000 150 42 5 pc2
 ```
+
 ### Salidas generadas
 
 | Archivo | Contenido |
@@ -26,17 +28,17 @@ bash profiling.sh ../build/MnistNEAT 60 1000 150 42 5 pc2
 
 ### Equipo utilizado 
 
-- **Modelo:** Lenovo Yoga Slim 9 14ILL10
-- **Sistema operativo:** Ubuntu 26.04.1 LTS
-- **CPU:** Intel(R) Core(TM) Ultra 7 258V ("Lunar Lake")
+- Modelo: Lenovo Yoga Slim 9 14ILL10
+- Sistema operativo: Ubuntu 26.04.1 LTS
+- CPU: Intel(R) Core(TM) Ultra 7 258V ("Lunar Lake")
   - 8 núcleos físicos, 1 hilo por núcleo (sin Hyper-Threading) → 8 CPUs lógicas
   - Arquitectura híbrida P-core / E-core (Intel no reporta el desglose
     exacto vía `lscpu` en este modelo; los `perf events` sí distinguen
     `cpu_core` de `cpu_atom`, ver nota abajo)
   - Frecuencia: 400 MHz – 4800 MHz (escalado dinámico)
   - Caché: L1d 320 KiB, L1i 512 KiB, L2 14 MiB, L3 12 MiB
-- **RAM:** 30 GiB (18 GiB libres al momento de las pruebas)
-- **Compilador:** GCC 15.2.0
+- RAM: 30 GiB (18 GiB libres al momento de las pruebas)
+- Compilador: GCC 15.2.0
 
 
 ### Configuración de la prueba 
@@ -45,7 +47,7 @@ bash profiling.sh ../build/MnistNEAT 60 1000 150 42 5 pc2
 
 ### Resultados de profiling 
 
-**Configuración:** 200 generaciones / 2000 imágenes / población de 150 / semilla 42 — 5 corridas
+Configuración: 200 generaciones / 2000 imágenes / población de 150 / semilla 42 — 5 corridas
 
 | Herramienta | Métrica | Valor | Propio | % propio | % acum. |
 |---|---|---|---|---|---|
@@ -69,20 +71,18 @@ bash profiling.sh ../build/MnistNEAT 60 1000 150 42 5 pc2
 | gperftools | `activationFn` | -- | 4.81 s | 0.50% | 97.81% |
 | gperftools | `__expf_fma` | -- | 4.74 s | 0.49% | 98.30% |
 | gperftools | `processFn` | -- | 4.19 s | 0.43% | 98.73% |
-### Tiempo total
 
 
 ## Computadora 2
 
 ### Equipo utilizado
-## Especificaciones del sistema
 
-- **CPU:** AMD Ryzen 5 4500U with Radeon Graphics (6 núcleos, 1 hilo por núcleo)
-- **Frecuencia:** 1.4 GHz – 4.0 GHz
-- **Caché:** L1d 192 KiB, L1i 192 KiB, L2 3 MiB, L3 8 MiB
-- **RAM:** 15 GB (4 GB swap)
-- **Instrucciones:** SSE, SSE2, SSSE3, SSE4.1/4.2, AVX, AVX2
-- **SO:** Arch Linux, kernel 7.1.8-arch1-3
+- CPU: AMD Ryzen 5 4500U with Radeon Graphics (6 núcleos, 1 hilo por núcleo)
+- Frecuencia: 1.4 GHz – 4.0 GHz
+- Caché: L1d 192 KiB, L1i 192 KiB, L2 3 MiB, L3 8 MiB
+- RAM: 15 GB (4 GB swap)
+- Instrucciones: SSE, SSE2, SSSE3, SSE4.1/4.2, AVX, AVX2
+- SO: Arch Linux, kernel 7.1.8-arch1-3
 
 ## Resultados de profiling
 
@@ -106,7 +106,6 @@ bash profiling.sh ../build/MnistNEAT 60 1000 150 42 5 pc2
 | gperftools | `processFn` | -- | 10.42 s | 0.57% | 98.11% |
 | gperftools | `Population::runNetworkAuto` | -- | 0.72 s | 0.04% | 98.15% |
 
-<<<<<<< HEAD
 
 ## Jetson Nano
 
@@ -158,44 +157,6 @@ bash profiling.sh ../build/MnistNEAT 60 1000 150 42 5 pc2
 | perf stat | Context switches | 3,707 |
 | programa | Tiempo total reportado (5 corridas) | 690.0 – 692.4 s (media 691.5 s) |
 | programa | Reparto por etapa | evaluar 68% / especiar 15% / cruzar 17% / mutar 0% |
-=======
-## Sistema empotrado (Jetson)
-
-### Equipo utilizado
-
-- **Modelo:** NVIDIA Jetson (host `jetson-181`)
-- **Versión evaluada:** sin optimizar (1.0 CPU utilizada)
-
-### Resultados de profiling
-
-**Configuración:** 10 generaciones / 2000 imágenes / población de 150 / semilla 42 — 2 corridas, esto se realizo asi debido al excesivo tiempo de corrida de la jetson
-
-| Herramienta | Métrica | Valor | Propio | % propio | % acum. |
-|---|---|---|---|---|---|
-| perf stat | Tiempo total (wall-clock) | 135.17 s ± 0.09% | -- | -- | -- |
-| perf stat | Task-clock | 135.12 s | -- | -- | -- |
-| perf stat | CPUs utilizadas (promedio) | 1.0 | -- | -- | -- |
-| perf stat | Instrucciones | 241,290,505,625 | -- | -- | -- |
-| perf stat | IPC | 1.88 | -- | -- | -- |
-| perf stat | Ciclos de CPU | 128,224,055,624 (0.95 GHz) | -- | -- | -- |
-| perf stat | Branch misses | 40,542,769 (branches no soportado) | -- | -- | -- |
-| perf stat | Page faults | 19,744 | -- | -- | -- |
-| perf stat | Context switches | 1,208 | -- | -- | -- |
-| perf stat | CPU migrations | 0 | -- | -- | -- |
-| perf record/report | `Genome::runNetwork` | -- | -- | 59.56%  | -- |
-| perf record/report | `Population::crossover` | -- | -- | 16.48%  | -- |
-| perf record/report | `Population::compareGenomes` | -- | -- | 15.44%  | -- |
-| gperftools | `Genome::runNetwork` | -- | 162.57 s | 59.9% | 59.9% |
-| gperftools | `Population::crossover` | -- | 45.10 s | 16.6% | 76.5% |
-| gperftools | `Population::compareGenomes` | -- | 42.01 s | 15.5% | 92.0% |
-| gperftools | `Genome::loadInputs` | -- | 8.05 s | 3.0% | 95.0% |
-| gperftools | `processFn` | -- | 2.71 s | 1.0% | 96.0% |
-| gperftools | `mnist::read_mnist_image_file` | -- | 1.09 s | 0.4% | 96.4% |
-| gperftools | `__random` | -- | 1.03 s | 0.4% | 96.8% |
-| gperftools | `__GI___expf` | -- | 0.93 s | 0.3% | 97.1% |
-
-
->>>>>>> bedfcf7 (docs(profiling): add metrics table withput optimization for Jetson Nano)
 
 
 ### Conclusiones 
@@ -206,7 +167,7 @@ El tiempo de ejecución es dominado por `runNetwork` (cerca del 59% para la pc1 
 
 ## Computadora 1
 
-**Configuración:** 200 generaciones / 2000 imágenes / población de 150 / semilla 42 — 5 corridas
+Configuración: 200 generaciones / 2000 imágenes / población de 150 / semilla 42 — 5 corridas
 
 ### Resultados del profiling
 
@@ -239,13 +200,13 @@ El procesador tiene núcleos de rendimiento (P-core) y eficientes (E-core), y `p
 
 | Métrica | Sin optimizar | Optimizado | Mejora |
 |---|---|---|---|
-| Tiempo total (wall-clock) | 193.95 s ± 1.06 s | 90.91 s ± 5.10 s | **~2.13×** |
+| Tiempo total (wall-clock) | 193.95 s ± 1.06 s | 90.91 s ± 5.10 s | ~2.13× |
 | CPUs utilizadas (promedio) | 1.0 | 4.1 | — |
 | `Genome::runNetwork` (perf) | 58.76% ± 0.05 | 67.32% | — |
 | `Population::crossover` (perf) | 24.61% ± 0.01 | 27.27% | — |
 | `Population::compareGenomes` (perf) | 12.91% ± 0.01 | 0.43% | — |
 
-Con una metodología similar en los dos casos (200 generaciones, 2000 imágenes, población de 150, semilla de 42 y cinco repeticiones), la optimización con OpenMP disminuye el tiempo real de ejecución de **193.95 s ± 1.06 s** a **90.91 s ± 5.10 s**, lo que representa una mejora aproximada del **~2.13x**. Esto concuerda con el incremento en el uso de CPU reportado por `perf stat` (de 1.0 CPU empleada, lo que indica ejecución en un solo hilo, a 4.1 CPUs en la versión paralela). Se confirma que `Genome::runNetwork` sigue siendo la etapa predominante en las dos versiones (58.76% a 67.32% de tiempo propio), seguida por `Population::crossover` (24.61% a 27.27%). En cambio, `Population::compareGenomes` disminuyó desde el 12.91% hasta un mínimo del 0.43%. Por otra parte, que el porcentaje relativo de `runNetwork` y `crossover` se haya incrementado no significa que sean más lentas, ya que al disminuir el tiempo total, cualquier fase no optimizada ocupa una porción más grande del conjunto.
+Con una metodología similar en los dos casos (200 generaciones, 2000 imágenes, población de 150, semilla de 42 y cinco repeticiones), la optimización con OpenMP disminuye el tiempo real de ejecución de 193.95 s ± 1.06 s a 90.91 s ± 5.10 s, lo que representa una mejora aproximada del ~2.13x. Esto concuerda con el incremento en el uso de CPU reportado por `perf stat` (de 1.0 CPU empleada, lo que indica ejecución en un solo hilo, a 4.1 CPUs en la versión paralela). Se confirma que `Genome::runNetwork` sigue siendo la etapa predominante en las dos versiones (58.76% a 67.32% de tiempo propio), seguida por `Population::crossover` (24.61% a 27.27%). En cambio, `Population::compareGenomes` disminuyó desde el 12.91% hasta un mínimo del 0.43%. Por otra parte, que el porcentaje relativo de `runNetwork` y `crossover` se haya incrementado no significa que sean más lentas, ya que al disminuir el tiempo total, cualquier fase no optimizada ocupa una porción más grande del conjunto.
 
 ## Computadora 2 
 
