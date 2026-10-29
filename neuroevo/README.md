@@ -1,6 +1,6 @@
-# neuroevo
+# Driver genérico de neuroevolución NEAT
 
-Driver genérico de neuroevolución NEAT. Separa qué se resuelve (`Task`) de dónde se evalúa (`Evaluator`),
+Separa qué se resuelve (`Task`) de dónde se evalúa (`Evaluator`),
 para que MNIST, XOR y futuros problemas corran igual en CPU, GPU y FPGA.
 
 ```
