@@ -235,7 +235,7 @@ Los argumentos son: binario, tarea, evaluador, generaciones, imágenes, poblaci�
 
 [![Demostración del prototipo en CPU](https://img.youtube.com/vi/gNGZxSdEBlY/0.jpg)](https://www.youtube.com/watch?v=gNGZxSdEBlY)
 
-<!-- Agregar aquí el video del prototipo con GPU -->
+[![Demostración del prototipo en GPU](https://img.youtube.com/vi/ulxpCqAUN4E/0.jpg)](https://www.youtube.com/watch?v=ulxpCqAUN4E)
 
 ## Créditos
 
