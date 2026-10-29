@@ -1,0 +1,121 @@
+Cargando MNIST desde /home/el5859/esteb/ProyectoFinalHeterogeneos/examples/mnist/mnist ...
+Poblacion 150 | 2000 imagenes de entrenamiento | 1000 de prueba | 10 generaciones | semilla 42
+Ajustes: FIX_BIAS=1 PROTECT_ELITE=1 TEMPLATE_PARAMS=0
+
+gen    0 | train  18.1% | test  17.5% | evaluar 8.68s especiar 2.15s cruzar 2.45s mutar 0.002s
+gen    9 | train  37.3% | test  33.6% | evaluar 8.87s especiar 2.07s cruzar 2.43s mutar 0.004s
+
+Tiempo total 133.4s: evaluar 66% | especiar 16% | cruzar 18% | mutar 0%
+
+Ejemplos con el mejor individuo:
+                                
+                                
+                                
+          ::--..                
+          ****%%%%%%%%%%++      
+                ......++++      
+                    ..@@..      
+                    **==        
+                  ..%%..        
+                  ##==          
+                ==##            
+              ..@@..            
+              **@@..            
+              --::              
+    real: 7   NEAT dice: 3
+
+                                
+              ::====..          
+            ++@@%%%%++          
+          ..@@::  ++**          
+                ..%%++          
+                **%%..          
+              ==@@::            
+            ..%%++              
+            ++%%..              
+            @@++        ..----  
+            %%@@@@@@##%%@@%%##::
+            ..::--====::        
+                                
+                                
+    real: 2   NEAT dice: 7
+
+                                
+                                
+                    **::        
+                    ##          
+                  --++          
+                  **==          
+                ..##..          
+                --##            
+                **--            
+                %%::            
+              ::@@..            
+              ==++              
+                                
+                                
+    real: 1   NEAT dice: 1
+
+Registro por generacion en mnist_neat_log.csv; poblacion guardada en mnist_neat_backup.txt
+[ perf record: Woken up 51 times to write data ]
+[ perf record: Captured and wrote 12.923 MB ./jetson/runs_10gen_2000img/perf_10gen_2000img_run2.data (135267 samples) ]
+Cargando MNIST desde /home/el5859/esteb/ProyectoFinalHeterogeneos/examples/mnist/mnist ...
+Poblacion 150 | 2000 imagenes de entrenamiento | 1000 de prueba | 10 generaciones | semilla 42
+Ajustes: FIX_BIAS=1 PROTECT_ELITE=1 TEMPLATE_PARAMS=0
+
+gen    0 | train  18.1% | test  17.5% | evaluar 8.68s especiar 2.15s cruzar 2.46s mutar 0.002s
+gen    9 | train  37.3% | test  33.6% | evaluar 8.96s especiar 2.09s cruzar 2.45s mutar 0.004s
+
+Tiempo total 134.1s: evaluar 66% | especiar 16% | cruzar 18% | mutar 0%
+
+Ejemplos con el mejor individuo:
+                                
+                                
+                                
+          ::--..                
+          ****%%%%%%%%%%++      
+                ......++++      
+                    ..@@..      
+                    **==        
+                  ..%%..        
+                  ##==          
+                ==##            
+              ..@@..            
+              **@@..            
+              --::              
+    real: 7   NEAT dice: 3
+
+                                
+              ::====..          
+            ++@@%%%%++          
+          ..@@::  ++**          
+                ..%%++          
+                **%%..          
+              ==@@::            
+            ..%%++              
+            ++%%..              
+            @@++        ..----  
+            %%@@@@@@##%%@@%%##::
+            ..::--====::        
+                                
+                                
+    real: 2   NEAT dice: 7
+
+                                
+                                
+                    **::        
+                    ##          
+                  --++          
+                  **==          
+                ..##..          
+                --##            
+                **--            
+                %%::            
+              ::@@..            
+              ==++              
+                                
+                                
+    real: 1   NEAT dice: 1
+
+Registro por generacion en mnist_neat_log.csv; poblacion guardada en mnist_neat_backup.txt
+PROFILE: interrupts/evictions/bytes = 13572/5229/316416

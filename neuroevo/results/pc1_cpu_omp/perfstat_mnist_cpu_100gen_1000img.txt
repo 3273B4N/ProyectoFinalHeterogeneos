@@ -1,0 +1,26 @@
+
+ Performance counter stats for './build/neuroevo --task mnist --eval cpu --gens 100 --train 1000 --pop 150 --seed 42' (5 runs):
+
+            54,648      context-switches                 #    390.0 cs/sec  cs_per_second       ( +-  2.92% )
+             1,363      cpu-migrations                   #      9.7 migrations/sec  migrations_per_second  ( +- 10.18% )
+            29,888      page-faults                      #    213.3 faults/sec  page_faults_per_second  ( +-  0.03% )
+        140,117.92 msec task-clock                       #      3.6 CPUs  CPUs_utilized         ( +-  2.58% )
+       271,915,556      cpu_core/branch-misses/          #      0.1 %  branch_miss_rate         ( +-  4.69% )  (54.29%)
+   494,456,929,540      cpu_core/branches/               #   3528.9 M/sec  branch_frequency     ( +-  2.93% )  (54.29%)
+   327,386,173,017      cpu_core/cpu-cycles/             #      2.3 GHz  cycles_frequency       ( +-  2.51% )  (54.29%)
+ 2,363,747,326,347      cpu_core/instructions/           #      7.2 instructions  insn_per_cycle  ( +-  2.62% )  (54.29%)
+       141,238,971      cpu_atom/branch-misses/          #      0.0 %  branch_miss_rate         ( +-  6.54% )  (33.39%)
+   327,148,457,690      cpu_atom/branches/               #   2334.8 M/sec  branch_frequency     ( +-  3.69% )  (33.51%)
+   305,586,021,096      cpu_atom/cpu-cycles/             #      2.2 GHz  cycles_frequency       ( +-  3.02% )  (33.39%)
+ 1,810,326,791,016      cpu_atom/instructions/           #      5.9 instructions  insn_per_cycle  ( +-  2.84% )  (33.39%)
+             TopdownL1 (cpu_core)                        #     22.4 %  tma_backend_bound      
+                                                         #      1.7 %  tma_bad_speculation    
+                                                         #      2.0 %  tma_frontend_bound     
+                                                         #     73.9 %  tma_retiring             ( +-  2.62% )  (54.29%)
+             TopdownL1 (cpu_atom)                        #      1.5 %  tma_bad_speculation      ( +-  6.00% )  (33.41%)
+                                                         #     21.2 %  tma_backend_bound        ( +-  0.70% )  (33.41%)
+                                                         #      0.0 %  tma_frontend_bound       (37.59%)
+                                                         #      0.0 %  tma_retiring             (37.56%)
+
+      39.248307099 +- 0.355459310 seconds time elapsed  ( +-  0.91% )
+
