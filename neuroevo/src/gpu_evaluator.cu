@@ -31,8 +31,13 @@ void GpuEvaluator::init(const Task& task, int popSize, StageTimers& timers){
     
     const Batch& train = task.train();
     gpuEvaluatorCheckCuda(cudaMallocManaged(&d_inputs_, train.inputs.size() * sizeof(float)));
-    for (size_t i = 0; i < train.inputs.size(); i++) {
-        d_inputs_[i] = train.inputs[i];
+
+    inputSamples_ = train.nSamples;
+
+    for (int j  = 0; j < train.nSamples; j++) {
+        for (int k = 0; k < train.nIn; k++){
+            d_inputs_[(size_t)k * train.nSamples + j] = train.inputs[(size_t)j * train.nIn + k];
+        }
     }
     
     size_t outputSize = (size_t)popSize_ * (size_t)train.nSamples * (size_t)train.nOut * sizeof(float);
@@ -86,7 +91,7 @@ __global__ void evaluateKernel(const int32_t* nodeOff, const int32_t* connOff, c
         if (s == 0) {
           valor = 1.0f; // este es el valor del bias 
 			} else if (s>=1 && s<=nIn) {
-        valor = inputs[m*nIn+s-1 ];
+        valor = inputs[(size_t)(s-1)*nSamples+m];
         } else {
            valor = cajas[ s - nIn - 1 ];
          }
@@ -118,6 +123,9 @@ __global__ void evaluateKernel(const int32_t* nodeOff, const int32_t* connOff, c
 
 
 void GpuEvaluator::evaluate(neat::Population& pop, const Task& task, const Batch& batch) {
+    
+    if (batch.nSamples != inputSamples_)
+    throw std::runtime_error("batch distinto al que hay en init()");
     PackedBatch packed;
     {
         StageTimers::Scope s(*timers_,"pack");
