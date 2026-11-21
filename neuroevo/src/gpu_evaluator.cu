@@ -2,6 +2,7 @@
 #include <string>
 # include <cuda_runtime.h>
 #include <stdexcept>
+#include <cstring>
 
 #define  BLOCK_SIZE 128
 #define MAX_CAJAS 303 // nota:  este numero se debe de recalcular si se cambia el numero maximo de nodos y/o el numero de entradas, la formula es: #maximo de  nodos - (nIn+1), con  el numero de nodos igual a 500 y nIn 196 para este ejemplo, da un numero maximo de cajas de 303  
@@ -145,33 +146,14 @@ void GpuEvaluator::evaluate(neat::Population& pop, const Task& task, const Batch
     }
     {
         StageTimers::Scope timer(*timers_, "h2d");
-        //copiar el desplazamiento de las conexiones 
-        for (size_t i=0; i<packed.connOff.size(); i++){
-            device_.connOff[i] = packed.connOff[i];
-        }
-        //copiar el desplazamiento de las conexiones 
-        for (size_t i=0; i<packed.nodeOff.size(); i++){
-            device_.nodeOff[i] = packed.nodeOff[i];
-        }
-        // Copiar la informacion de las capas
-        for (size_t i = 0; i < packed.layer.size(); i++) {
-            device_.layerOff[i] = packed.layer[i];
-        }
-
-        // Copiar los nodos de origen de cada conexion
-        for (size_t i = 0; i < packed.src.size(); i++) {
-            device_.src[i] = packed.src[i];
-        }
-
-        // Copiar los nodos de destino de cada conexion
-        for (size_t i = 0; i < packed.dst.size(); i++) {
-            device_.dst[i] = packed.dst[i];
-        }
-
-        // Copiar los pesos de las conexiones
-        for (size_t i = 0; i < packed.w.size(); i++) {
-            device_.w[i] = packed.w[i];
-        }
+        
+        //optimización 2: copia en bloque en lugar de bucles. 
+        memcpy(device_.connOff, packed.connOff.data(), packed.connOff.size() * sizeof(int32_t));
+        memcpy(device_.nodeOff, packed.nodeOff.data(), packed.nodeOff.size() * sizeof(int32_t));
+        memcpy(device_.layerOff, packed.layer.data(), packed.layer.size() * sizeof(int32_t));
+        memcpy(device_.src, packed.src.data(), packed.src.size() * sizeof(int32_t));
+        memcpy(device_.dst, packed.dst.data(), packed.dst.size() * sizeof(int32_t));
+        memcpy(device_.w, packed.w.data(), packed.w.size() * sizeof(float));
     }
 
     {
