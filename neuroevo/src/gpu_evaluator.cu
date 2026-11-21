@@ -3,6 +3,7 @@
 # include <cuda_runtime.h>
 #include <stdexcept>
 #include <cstring>
+#include <cmath>
 
 #define  BLOCK_SIZE 128
 #define MAX_CAJAS 303 // nota:  este numero se debe de recalcular si se cambia el numero maximo de nodos y/o el numero de entradas, la formula es: #maximo de  nodos - (nIn+1), con  el numero de nodos igual a 500 y nIn 196 para este ejemplo, da un numero maximo de cajas de 303  
@@ -44,6 +45,8 @@ void GpuEvaluator::init(const Task& task, int popSize, StageTimers& timers){
     size_t outputSize = (size_t)popSize_ * (size_t)train.nSamples * (size_t)train.nOut * sizeof(float);
     
     gpuEvaluatorCheckCuda(cudaMallocManaged(&d_outputs_, outputSize));
+
+    gpuEvaluatorCheckCuda(cudaMallocManaged(&d_predictions_, (size_t)popSize_ * (size_t)train.nSamples * sizeof(int32_t) ));
 }
 
 GpuEvaluator::~GpuEvaluator() {
@@ -57,13 +60,14 @@ GpuEvaluator::~GpuEvaluator() {
     cudaFree(device_.w);
     cudaFree(d_inputs_);
     cudaFree(d_outputs_);
+    cudaFree(d_predictions_);
 
 }
 
 __device__ float sigmoide(float x) {return 1.0f/(1.0f+expf(-x)); }// esta es la funcion de activacion de los nodos, se deja como funcion inlin en caso de de que quiera cambiar en un futuro o si se quisiera optimizar 
 
 // kernel de evaluacion
-__global__ void evaluateKernel(const int32_t* nodeOff, const int32_t* connOff, const int32_t* layer, const int32_t* src, const int32_t* dst, const float* w, const float* inputs, float* outputs, int nIn, int nSamples, int nOut, int totalThreads){
+__global__ void evaluateKernel(const int32_t* nodeOff, const int32_t* connOff, const int32_t* layer, const int32_t* src, const int32_t* dst, const float* w, const float* inputs, float* outputs, int32_t* pred, int nIn, int nSamples, int nOut, int totalThreads){
 	int idx = blockIdx.x*blockDim.x + threadIdx.x;
 	if (idx >= totalThreads) return; //validar los limites
 
@@ -115,9 +119,19 @@ __global__ void evaluateKernel(const int32_t* nodeOff, const int32_t* connOff, c
 	}
 
 	// escribir salidas
-	for(int k=0; k<nOut; k++) {
-	outputs[idx*nOut + k]=cajas[k] ;
-	}
+	if (pred != nullptr){
+        int best_pred = 0;
+        for (int k = 1; k< nOut ; k++){
+            if (cajas[k] > cajas[best_pred]){
+                best_pred = k;
+            }
+        }
+        pred[idx] = best_pred;
+	} else {
+        for (int k = 0; k < nOut; k++){
+            outputs[idx*nOut+k] = cajas[k];
+        }
+    }
 	
 }
 
@@ -144,6 +158,7 @@ void GpuEvaluator::evaluate(neat::Population& pop, const Task& task, const Batch
         std::string errorMessage = "GpuEvaluator::evaluate: la población superó el margen que se reservó en init()";
         throw std::runtime_error(errorMessage);
     }
+    bool usePred = !batch.labels.empty();
     {
         StageTimers::Scope timer(*timers_, "h2d");
         
@@ -177,7 +192,7 @@ void GpuEvaluator::evaluate(neat::Population& pop, const Task& task, const Batch
   		  }
 	  
 	//invocacion del kernel
-	evaluateKernel<<<grid,block>>> (device_.nodeOff,device_.connOff,device_.layerOff,device_.src,device_.dst,device_.w, d_inputs_, d_outputs_,batch.nIn, batch.nSamples, batch.nOut,totalThreads);
+	evaluateKernel<<<grid,block>>> (device_.nodeOff,device_.connOff,device_.layerOff,device_.src,device_.dst,device_.w, d_inputs_, d_outputs_, usePred ? d_predictions_: nullptr, batch.nIn, batch.nSamples, batch.nOut,totalThreads);
 
 	// ver si hay errores y sincronizar
 	gpuEvaluatorCheckCuda(cudaGetLastError());
@@ -187,8 +202,20 @@ void GpuEvaluator::evaluate(neat::Population& pop, const Task& task, const Batch
     {
         StageTimers::Scope s(*timers_,"d2h");
         for (int genomeId = 0; genomeId < (int)pop.genomes.size(); genomeId++){
-            float*out = d_outputs_ + (size_t)genomeId * (size_t)batch.nSamples * (size_t)batch.nOut;
-            pop.genomes[(size_t)genomeId].fitness = task.fitness(batch, out);
+            if (usePred){
+                const int32_t* pred = d_predictions_ + (size_t)genomeId * (size_t)batch.nSamples;
+                int correct = 0;
+                for (int s = 0; s<batch.nSamples; s++){
+                    if (pred[s] == batch.labels[(size_t)s]){
+                        correct++;
+                    }
+                }
+                float precision = (float)correct / (float)batch.nSamples;
+                pop.genomes[(size_t)genomeId].fitness = pow(precision, 4.0f);
+            } else {
+                float*out = d_outputs_ + (size_t)genomeId * (size_t)batch.nSamples * (size_t)batch.nOut;
+                pop.genomes[(size_t)genomeId].fitness = task.fitness(batch, out);
+            }
         }
     }
 }
