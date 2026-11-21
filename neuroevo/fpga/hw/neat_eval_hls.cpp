@@ -27,14 +27,14 @@ void neat_eval_hls(const int32_t* nodeOff, const int32_t* connOff,
                    const int32_t* layer, const int32_t* src, const int32_t* dst,
                    const data_t* w, const data_t* inputs, data_t* outputs,
                    int nGenomes, int nSamples, int nIn, int nOut) {
-#pragma HLS INTERFACE m_axi port=nodeOff offset=slave bundle=gmem0 depth=1024
-#pragma HLS INTERFACE m_axi port=connOff offset=slave bundle=gmem1 depth=1024
-#pragma HLS INTERFACE m_axi port=layer   offset=slave bundle=gmem2 depth=262144
-#pragma HLS INTERFACE m_axi port=src     offset=slave bundle=gmem3 depth=1048576
-#pragma HLS INTERFACE m_axi port=dst     offset=slave bundle=gmem4 depth=1048576
-#pragma HLS INTERFACE m_axi port=w       offset=slave bundle=gmem5 depth=1048576
-#pragma HLS INTERFACE m_axi port=inputs  offset=slave bundle=gmem6 depth=1048576
-#pragma HLS INTERFACE m_axi port=outputs offset=slave bundle=gmem7 depth=1048576
+#pragma HLS INTERFACE m_axi port=nodeOff offset=slave bundle=gmem0 depth=16
+#pragma HLS INTERFACE m_axi port=connOff offset=slave bundle=gmem1 depth=16
+#pragma HLS INTERFACE m_axi port=layer   offset=slave bundle=gmem2 depth=1024
+#pragma HLS INTERFACE m_axi port=src     offset=slave bundle=gmem3 depth=8192
+#pragma HLS INTERFACE m_axi port=dst     offset=slave bundle=gmem4 depth=8192
+#pragma HLS INTERFACE m_axi port=w       offset=slave bundle=gmem5 depth=8192
+#pragma HLS INTERFACE m_axi port=inputs  offset=slave bundle=gmem6 depth=8192
+#pragma HLS INTERFACE m_axi port=outputs offset=slave bundle=gmem7 depth=8192
 #pragma HLS INTERFACE s_axilite port=nodeOff  bundle=control
 #pragma HLS INTERFACE s_axilite port=connOff  bundle=control
 #pragma HLS INTERFACE s_axilite port=layer    bundle=control

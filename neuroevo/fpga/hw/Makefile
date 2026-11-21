@@ -1,7 +1,8 @@
 # Setting relevant variables
 ROOT_DIR=$(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 TARGET := hw
-PLATFORM := $(ROOT_DIR)/../platform/kv260_custom.xpfm
+PLATFORM_DIR ?= $(ROOT_DIR)/../platform
+PLATFORM := $(PLATFORM_DIR)/kv260_custom.xpfm
 
 DESIGN_FILE_NAME = neat_eval_hls
 
@@ -90,11 +91,11 @@ $(XCL_BIN): $(LINK_OUTPUT)
 	mkdir -p $(PACKAGE_OUT)
 	cp $< $@
 
-$(SHELL_JSON): $(ROOT_DIR)/../platform/shell.json
+$(SHELL_JSON): $(PLATFORM_DIR)/shell.json
 	mkdir -p $(PACKAGE_OUT)
 	cp $< $@
 
-$(DTB_FILE): $(ROOT_DIR)/../platform/pl.dtbo
+$(DTB_FILE): $(PLATFORM_DIR)/pl.dtbo
 	mkdir -p $(PACKAGE_OUT)
 	cp $< $@
 

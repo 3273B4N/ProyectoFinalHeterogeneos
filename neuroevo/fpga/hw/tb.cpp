@@ -30,6 +30,16 @@ static void agregar(Lote& L, const Red& r) {
   L.connOff.push_back(L.connOff.back() + (int)r.src.size());
 }
 
+template <class T> static void pad(std::vector<T>& v, size_t n) { if (v.size() < n) v.resize(n); }
+static void llamar(Lote& L, std::vector<data_t>& in, std::vector<data_t>& out,
+                   int nG, int nS, int nIn, int nOut) {
+  pad(L.nodeOff, 16); pad(L.connOff, 16); pad(L.layer, 1024);
+  pad(L.src, 8192); pad(L.dst, 8192); pad(L.w, 8192);
+  pad(in, 8192); pad(out, 8192);
+  neat_eval_hls(L.nodeOff.data(), L.connOff.data(), L.layer.data(), L.src.data(), L.dst.data(),
+                L.w.data(), in.data(), out.data(), nG, nS, nIn, nOut);
+}
+
 static void referencia(const Red& r, const float* img, int nIn, int nOut, double* out) {
   int n = (int)r.capa.size();
   std::vector<double> val(n, 0.0);
@@ -91,11 +101,12 @@ static int probar(const char* nombre, const std::vector<Red>& redes, const std::
   int nG = (int)redes.size();
   std::vector<data_t> in(imgs.begin(), imgs.end());
   std::vector<data_t> out((size_t)nG * nSamples * nOut, (data_t)-7);
-
-  neat_eval_hls(L.nodeOff.data(), L.connOff.data(), L.layer.data(), L.src.data(), L.dst.data(),
-                L.w.data(), in.data(), out.data(), nG, nSamples, nIn, nOut);
+  
+  int conexiones = L.connOff.back();   // antes de llamar(): el padding cambia back()
+  llamar(L, in, out, nG, nSamples, nIn, nOut);
 
   double err = 0.0;
+
   std::vector<double> ref(nOut);
   for (int g = 0; g < nG; g++)
     for (int m = 0; m < nSamples; m++) {
@@ -105,7 +116,6 @@ static int probar(const char* nombre, const std::vector<Red>& redes, const std::
         if (d > err) err = d;
       }
     }
-  int conexiones = L.connOff.back();
   printf("%-28s genomas=%-3d imagenes=%-4d conexiones=%-6d error max=%.3e  %s\n",
          nombre, nG, nSamples, conexiones, err, err <= tol ? "OK" : "FALLO");
   return err <= tol ? 0 : 1;
@@ -123,8 +133,7 @@ int main() {
     fallos += probar("XOR armado a mano", {redXor()}, imgs, 4, 2, 1, tol);
     Lote L; agregar(L, redXor());
     std::vector<data_t> in(imgs.begin(), imgs.end()), out(4);
-    neat_eval_hls(L.nodeOff.data(), L.connOff.data(), L.layer.data(), L.src.data(), L.dst.data(),
-                  L.w.data(), in.data(), out.data(), 1, 4, 2, 1);
+    llamar(L, in, out, 1, 4, 2, 1);
     int esperado[4] = {0, 1, 1, 0}, ok = 1;
     for (int i = 0; i < 4; i++) ok &= ((out[i] > 0.5f) == (esperado[i] == 1));
     printf("%-28s salidas = %.4f %.4f %.4f %.4f  %s\n", "XOR, tabla de verdad",
