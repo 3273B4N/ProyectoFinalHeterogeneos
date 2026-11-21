@@ -7,3 +7,5 @@ libneat.a
 lib/libneat.a
 build/
 examples/neuroevo/profiling/gpu/
+.ipcache/
+.Xil/
