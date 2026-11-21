@@ -1,5 +1,10 @@
-// kernel HLS para evaluar la poblacion, misma logica que evaluateKernel de gpu_evaluator.cu
-// v0: sin macros | v1: -DUSE_PIPELINE | v2: -DUSE_PIPELINE -DUSE_LANES
+/* Kernel HLS para evaluar la poblacion en FPGA. Le damos multiples imagenes de entrada y nos devuelve las salidas de cada genoma para cada imagen.
+
+Versiones: 
+   v0: sin macros código limpio, sin pipeline ni lanes
+   v1: -DUSE_PIPELINE  pipeline - sin lanes
+   v2: -DUSE_PIPELINE -DUSE_LANES  con pipeline y lanes
+*/
 #include "neat_eval_hls.h"
 
 #ifdef __VITIS_HLS__
@@ -27,6 +32,7 @@ void neat_eval_hls(const int32_t* nodeOff, const int32_t* connOff,
                    const int32_t* layer, const int32_t* src, const int32_t* dst,
                    const data_t* w, const data_t* inputs, data_t* outputs,
                    int nGenomes, int nSamples, int nIn, int nOut) {
+// Interfaces
 #pragma HLS INTERFACE m_axi port=nodeOff offset=slave bundle=gmem0 depth=16
 #pragma HLS INTERFACE m_axi port=connOff offset=slave bundle=gmem1 depth=16
 #pragma HLS INTERFACE m_axi port=layer   offset=slave bundle=gmem2 depth=1024
@@ -35,6 +41,7 @@ void neat_eval_hls(const int32_t* nodeOff, const int32_t* connOff,
 #pragma HLS INTERFACE m_axi port=w       offset=slave bundle=gmem5 depth=8192
 #pragma HLS INTERFACE m_axi port=inputs  offset=slave bundle=gmem6 depth=8192
 #pragma HLS INTERFACE m_axi port=outputs offset=slave bundle=gmem7 depth=8192
+// Interface de control
 #pragma HLS INTERFACE s_axilite port=nodeOff  bundle=control
 #pragma HLS INTERFACE s_axilite port=connOff  bundle=control
 #pragma HLS INTERFACE s_axilite port=layer    bundle=control
@@ -49,14 +56,14 @@ void neat_eval_hls(const int32_t* nodeOff, const int32_t* connOff,
 #pragma HLS INTERFACE s_axilite port=nOut     bundle=control
 #pragma HLS INTERFACE s_axilite port=return   bundle=control
 
-  // red actual en BRAM (ids locales)
+  // BRAM para la red que se esta evaluando
   int32_t lsrc[MAX_CONNS];
   int32_t ldst[MAX_CONNS];
   int32_t lsrcLayer[MAX_CONNS];
   data_t  lw[MAX_CONNS];
   int32_t nodeLayer[MAX_NODES];
 
-  // valor de cada nodo por imagen: 0 = bias, 1..nIn = entradas, el resto salidas y ocultos
+  // Valor para cada nodo por imagen
   data_t vals[LANES][MAX_NODES];
 #ifdef USE_LANES
 #pragma HLS ARRAY_PARTITION variable=vals complete dim=1
@@ -69,12 +76,13 @@ void neat_eval_hls(const int32_t* nodeOff, const int32_t* connOff,
     const int cBegin   = connOff[g];
     const int nConns   = connOff[g + 1] - cBegin;
 
-    // si no cabe se devuelven ceros, el host tiene que revisar el tamano antes
+    // Si no cabe en la BRAM se devuelven ceros
+    // El host tiene que revisar el tamano antes
     if (nNodes > MAX_NODES || nConns > MAX_CONNS) {
       for (int i = 0; i < nSamples * nOut; i++) outputs[(g * nSamples) * nOut + i] = 0;
       continue;
     }
-
+    // Copiar la capa de cada nodo de la DDR a la BRAM
     CARGA_NODOS:
     for (int n = 0; n < nNodes; n++) {
 #ifdef USE_PIPELINE
@@ -82,6 +90,7 @@ void neat_eval_hls(const int32_t* nodeOff, const int32_t* connOff,
 #endif
       nodeLayer[n] = layer[nodeBase + n];
     }
+    // Copiar las conexiones a la BRAM y pasar los ids a locales
     CARGA_CONEXIONES:
     for (int c = 0; c < nConns; c++) {
 #ifdef USE_PIPELINE
@@ -95,10 +104,10 @@ void neat_eval_hls(const int32_t* nodeOff, const int32_t* connOff,
     }
 
     const int outLayer = nodeLayer[nIn + 1];
-
+    // Recorrer todas las imagenes de entrada en bloques de LANES en LANES
     IMAGENES:
     for (int m0 = 0; m0 < nSamples; m0 += LANES) {
-
+      // Valores iniciales de cada nodo para cada imagen
       INIT:
       for (int n = 0; n < nNodes; n++) {
 #ifdef USE_PIPELINE
@@ -113,7 +122,7 @@ void neat_eval_hls(const int32_t* nodeOff, const int32_t* connOff,
           vals[p][n] = v;
         }
       }
-
+      // Recorrer la red capa por capa hasta la capa de salida, sumando peso * valor en cada nodo      
       CAPAS:
       for (int l = 0; l < outLayer; l++) {
         CONEXIONES:
@@ -128,6 +137,7 @@ void neat_eval_hls(const int32_t* nodeOff, const int32_t* connOff,
             }
           }
         }
+        // Aplicar la funcion de activacion a los nodos de la capa siguiente
         ACTIVACION:
         for (int n = nIn + 1; n < nNodes; n++) {
 #ifdef USE_PIPELINE
@@ -142,7 +152,7 @@ void neat_eval_hls(const int32_t* nodeOff, const int32_t* connOff,
         }
       }
 
-      // salidas en orden [genoma][imagen][salida], igual que en GPU
+      // Salidas en orden [genoma][imagen][salida]
       SALIDAS:
       for (int p = 0; p < LANES; p++) {
         for (int k = 0; k < nOut; k++) {

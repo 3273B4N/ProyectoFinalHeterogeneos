@@ -1,4 +1,6 @@
-// testbench: compara el kernel contra una referencia en double (misma regla que CpuEvaluator)
+// Testbench para el kernel HLS
+// Le pasa redes NEAT e imagenes al kernel y compara sus salidas con una referencia en CPU
+
 #include <cstdio>
 #include <cmath>
 #include <vector>
@@ -6,18 +8,20 @@
 #include <algorithm>
 #include "neat_eval_hls.h"
 
+
 struct Red {
   std::vector<int> capa;
   std::vector<int> src, dst;
   std::vector<float> w;
 };
 
-// lote en CSR, igual que PackedBatch
+// Lote en CSR para pasar multiples genomas a la FPGA
 struct Lote {
   std::vector<int32_t> nodeOff{0}, connOff{0}, layer, src, dst;
   std::vector<data_t> w;
 };
 
+// Agrega una red al lote, ajustando los offsets
 static void agregar(Lote& L, const Red& r) {
   int base = L.nodeOff.back();
   for (int c : r.capa) L.layer.push_back(c);
@@ -29,8 +33,9 @@ static void agregar(Lote& L, const Red& r) {
   L.nodeOff.push_back(base + (int)r.capa.size());
   L.connOff.push_back(L.connOff.back() + (int)r.src.size());
 }
-
 template <class T> static void pad(std::vector<T>& v, size_t n) { if (v.size() < n) v.resize(n); }
+
+// Llama al kernel HLS con el lote y los vectores de entrada/salida
 static void llamar(Lote& L, std::vector<data_t>& in, std::vector<data_t>& out,
                    int nG, int nS, int nIn, int nOut) {
   pad(L.nodeOff, 16); pad(L.connOff, 16); pad(L.layer, 1024);
@@ -40,6 +45,7 @@ static void llamar(Lote& L, std::vector<data_t>& in, std::vector<data_t>& out,
                 L.w.data(), in.data(), out.data(), nG, nS, nIn, nOut);
 }
 
+// Referencia en CPU para comparar resultados
 static void referencia(const Red& r, const float* img, int nIn, int nOut, double* out) {
   int n = (int)r.capa.size();
   std::vector<double> val(n, 0.0);
@@ -57,7 +63,7 @@ static void referencia(const Red& r, const float* img, int nIn, int nOut, double
   for (int k = 0; k < nOut; k++) out[k] = val[nIn + 1 + k];
 }
 
-// XOR armado a mano, igual que en tests/test_core.cpp
+// Construye una red XOR a mano, con 2 entradas, 1 salida y 2 nodos ocultos
 static Red redXor() {
   Red r;
   r.capa = {0, 0, 0, 2, 1, 1};  // bias, x1, x2, salida, oculto OR, oculto AND
@@ -68,7 +74,7 @@ static Red redXor() {
   return r;
 }
 
-// red aleatoria tipo NEAT; completa = todas las entradas conectadas a las salidas (como MNIST)
+// Genera una red aleatoria NEAT
 static Red redAleatoria(std::mt19937& rng, int nIn, int nOut, int nOcultos, int capas, bool completa) {
   Red r;
   std::uniform_real_distribution<float> peso(-1.0f, 1.0f);
@@ -94,6 +100,7 @@ static Red redAleatoria(std::mt19937& rng, int nIn, int nOut, int nOcultos, int 
   return m;
 }
 
+// Ejecuta un escenario de prueba
 static int probar(const char* nombre, const std::vector<Red>& redes, const std::vector<float>& imgs,
                   int nSamples, int nIn, int nOut, double tol) {
   Lote L;
@@ -127,7 +134,7 @@ int main() {
   std::mt19937 rng(42);
   std::uniform_real_distribution<float> pix(0.0f, 1.0f);
 
-  // 1) XOR: las 4 combinaciones de entrada
+  // Prueba 1. XOR armado a mano con 4 imagenes
   {
     std::vector<float> imgs = {0, 0, 0, 1, 1, 0, 1, 1};
     fallos += probar("XOR armado a mano", {redXor()}, imgs, 4, 2, 1, tol);
@@ -140,8 +147,7 @@ int main() {
            (float)out[0], (float)out[1], (float)out[2], (float)out[3], ok ? "OK" : "FALLO");
     fallos += ok ? 0 : 1;
   }
-
-  // 2) redes pequenas aleatorias, 13 imagenes (no multiplo de los carriles)
+  // Prueba 2. redes aleatorias pequenas con 13 imagenes
   {
     int nIn = 5, nOut = 3, nS = 13;
     std::vector<Red> redes;
@@ -151,7 +157,7 @@ int main() {
     fallos += probar("redes aleatorias pequenas", redes, imgs, nS, nIn, nOut, tol);
   }
 
-  // 3) tamano MNIST: 196 -> 10
+  // Prueba 3. redes del tamano de MNIST (196 -> 10) con 37 imagenes
   {
     int nIn = 196, nOut = 10, nS = 37;
     std::vector<Red> redes;
