@@ -3,7 +3,7 @@ cd "$(dirname "$0")"
 source /usr/local/Xilinx/Vitis/2024.1/settings64.sh
 source ./variantes.sh
 
-rm -rf reports
+mkdir -p reports
 OK=(); FAIL=()
 
 for i in "${!NAMES[@]}"; do

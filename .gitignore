@@ -9,3 +9,12 @@ build/
 examples/neuroevo/profiling/gpu/
 .ipcache/
 .Xil/
+
+# salidas de Vitis HLS (neuroevo/fpga/hw)
+tmp.*/
+prj_*/
+v++_*.log
+xcd.log
+tmp_*.log
+log_*.txt
+**/reports/*/make.log
