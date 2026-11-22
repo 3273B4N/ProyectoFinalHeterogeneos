@@ -42,7 +42,7 @@ classDiagram
         -maxTotalConns_ int
         -d_inputs_, d_outputs_ float*
     }
-    class FpgaEvaluator["FpgaEvaluator (pendiente)"]
+    class FpgaEvaluator["FpgaEvaluator (Kria, XRT)"]
     class StageTimers
     class Population["neat::Population (libreria)"]
     class PackedBatch["PackedBatch (CSR)"] {
@@ -105,6 +105,18 @@ flowchart TD
 Las cuatro sub-etapas (`pack`, `h2d`, `kernel`, `d2h`) se declaran en `extraStages()` y se miden por separado en el CSV (`t_pack`, `t_h2d`, `t_kernel`, `t_d2h`), incluidas dentro del tiempo total de `evaluar`.
 
 Estado actual: el bloque `kernel` lanza `evaluateKernel` sobre los punteros de memoria unificada que se reservan en `init()`, con bloques de 128 hilos y un hilo por cada combinación de genoma e imagen. Cada hilo guarda los nodos ocultos y de salida en un arreglo local de `MAX_CAJAS` (303) posiciones; si un genoma necesita más, `evaluate()` se detiene con un error antes de lanzar el kernel. El kernel usa una sigmoide fija y la aptitud se calcula en la CPU (`d2h`) con la misma `Task::fitness` que usa `CpuEvaluator`.
+
+## Flujo interno de `evaluar` en FpgaEvaluator
+
+Corre en la Kria y reutiliza `packPopulation`. Detalle del contrato en [`FPGA_INTERFAZ.md`](FPGA_INTERFAZ.md).
+
+```mermaid
+flowchart TD
+    A["evaluate() - FpgaEvaluator"] --> B["pack<br/>packPopulation (CSR)"]
+    B --> C["h2d<br/>cuantizar a int16 + sync de xrt::bo"]
+    C --> D["kernel<br/>neat_eval (HLS), run.wait()"]
+    D --> E["d2h<br/>sync, int16 -> float, Task::fitness"]
+```
 
 ## Formato del lote empaquetado (`PackedBatch`)
 
