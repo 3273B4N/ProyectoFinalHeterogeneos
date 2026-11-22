@@ -2,6 +2,8 @@
 #include <string>
 # include <cuda_runtime.h>
 #include <stdexcept>
+#include <cstring>
+#include <cmath>
 
 #define  BLOCK_SIZE 128
 #define MAX_CAJAS 303 // nota:  este numero se debe de recalcular si se cambia el numero maximo de nodos y/o el numero de entradas, la formula es: #maximo de  nodos - (nIn+1), con  el numero de nodos igual a 500 y nIn 196 para este ejemplo, da un numero maximo de cajas de 303  
@@ -31,13 +33,20 @@ void GpuEvaluator::init(const Task& task, int popSize, StageTimers& timers){
     
     const Batch& train = task.train();
     gpuEvaluatorCheckCuda(cudaMallocManaged(&d_inputs_, train.inputs.size() * sizeof(float)));
-    for (size_t i = 0; i < train.inputs.size(); i++) {
-        d_inputs_[i] = train.inputs[i];
+
+    inputSamples_ = train.nSamples;
+
+    for (int j  = 0; j < train.nSamples; j++) {
+        for (int k = 0; k < train.nIn; k++){
+            d_inputs_[(size_t)k * train.nSamples + j] = train.inputs[(size_t)j * train.nIn + k];
+        }
     }
     
     size_t outputSize = (size_t)popSize_ * (size_t)train.nSamples * (size_t)train.nOut * sizeof(float);
     
     gpuEvaluatorCheckCuda(cudaMallocManaged(&d_outputs_, outputSize));
+
+    gpuEvaluatorCheckCuda(cudaMallocManaged(&d_predictions_, (size_t)popSize_ * (size_t)train.nSamples * sizeof(int32_t) ));
 }
 
 GpuEvaluator::~GpuEvaluator() {
@@ -51,13 +60,14 @@ GpuEvaluator::~GpuEvaluator() {
     cudaFree(device_.w);
     cudaFree(d_inputs_);
     cudaFree(d_outputs_);
+    cudaFree(d_predictions_);
 
 }
 
 __device__ float sigmoide(float x) {return 1.0f/(1.0f+expf(-x)); }// esta es la funcion de activacion de los nodos, se deja como funcion inlin en caso de de que quiera cambiar en un futuro o si se quisiera optimizar 
 
 // kernel de evaluacion
-__global__ void evaluateKernel(const int32_t* nodeOff, const int32_t* connOff, const int32_t* layer, const int32_t* src, const int32_t* dst, const float* w, const float* inputs, float* outputs, int nIn, int nSamples, int nOut, int totalThreads){
+__global__ void evaluateKernel(const int32_t* nodeOff, const int32_t* connOff, const int32_t* layer, const int32_t* src, const int32_t* dst, const float* w, const float* inputs, float* outputs, int32_t* pred, int nIn, int nSamples, int nOut, int totalThreads){
 	int idx = blockIdx.x*blockDim.x + threadIdx.x;
 	if (idx >= totalThreads) return; //validar los limites
 
@@ -86,7 +96,7 @@ __global__ void evaluateKernel(const int32_t* nodeOff, const int32_t* connOff, c
         if (s == 0) {
           valor = 1.0f; // este es el valor del bias 
 			} else if (s>=1 && s<=nIn) {
-        valor = inputs[m*nIn+s-1 ];
+        valor = inputs[(size_t)(s-1)*nSamples+m];
         } else {
            valor = cajas[ s - nIn - 1 ];
          }
@@ -109,15 +119,28 @@ __global__ void evaluateKernel(const int32_t* nodeOff, const int32_t* connOff, c
 	}
 
 	// escribir salidas
-	for(int k=0; k<nOut; k++) {
-	outputs[idx*nOut + k]=cajas[k] ;
-	}
+	if (pred != nullptr){
+        int best_pred = 0;
+        for (int k = 1; k< nOut ; k++){
+            if (cajas[k] > cajas[best_pred]){
+                best_pred = k;
+            }
+        }
+        pred[idx] = best_pred;
+	} else {
+        for (int k = 0; k < nOut; k++){
+            outputs[idx*nOut+k] = cajas[k];
+        }
+    }
 	
 }
 
 
 
 void GpuEvaluator::evaluate(neat::Population& pop, const Task& task, const Batch& batch) {
+    
+    if (batch.nSamples != inputSamples_)
+    throw std::runtime_error("batch distinto al que hay en init()");
     PackedBatch packed;
     {
         StageTimers::Scope s(*timers_,"pack");
@@ -135,35 +158,17 @@ void GpuEvaluator::evaluate(neat::Population& pop, const Task& task, const Batch
         std::string errorMessage = "GpuEvaluator::evaluate: la población superó el margen que se reservó en init()";
         throw std::runtime_error(errorMessage);
     }
+    bool usePred = !batch.labels.empty();
     {
         StageTimers::Scope timer(*timers_, "h2d");
-        //copiar el desplazamiento de las conexiones 
-        for (size_t i=0; i<packed.connOff.size(); i++){
-            device_.connOff[i] = packed.connOff[i];
-        }
-        //copiar el desplazamiento de las conexiones 
-        for (size_t i=0; i<packed.nodeOff.size(); i++){
-            device_.nodeOff[i] = packed.nodeOff[i];
-        }
-        // Copiar la informacion de las capas
-        for (size_t i = 0; i < packed.layer.size(); i++) {
-            device_.layerOff[i] = packed.layer[i];
-        }
-
-        // Copiar los nodos de origen de cada conexion
-        for (size_t i = 0; i < packed.src.size(); i++) {
-            device_.src[i] = packed.src[i];
-        }
-
-        // Copiar los nodos de destino de cada conexion
-        for (size_t i = 0; i < packed.dst.size(); i++) {
-            device_.dst[i] = packed.dst[i];
-        }
-
-        // Copiar los pesos de las conexiones
-        for (size_t i = 0; i < packed.w.size(); i++) {
-            device_.w[i] = packed.w[i];
-        }
+        
+        //optimización 2: copia en bloque en lugar de bucles. 
+        memcpy(device_.connOff, packed.connOff.data(), packed.connOff.size() * sizeof(int32_t));
+        memcpy(device_.nodeOff, packed.nodeOff.data(), packed.nodeOff.size() * sizeof(int32_t));
+        memcpy(device_.layerOff, packed.layer.data(), packed.layer.size() * sizeof(int32_t));
+        memcpy(device_.src, packed.src.data(), packed.src.size() * sizeof(int32_t));
+        memcpy(device_.dst, packed.dst.data(), packed.dst.size() * sizeof(int32_t));
+        memcpy(device_.w, packed.w.data(), packed.w.size() * sizeof(float));
     }
 
     {
@@ -187,7 +192,7 @@ void GpuEvaluator::evaluate(neat::Population& pop, const Task& task, const Batch
   		  }
 	  
 	//invocacion del kernel
-	evaluateKernel<<<grid,block>>> (device_.nodeOff,device_.connOff,device_.layerOff,device_.src,device_.dst,device_.w, d_inputs_, d_outputs_,batch.nIn, batch.nSamples, batch.nOut,totalThreads);
+	evaluateKernel<<<grid,block>>> (device_.nodeOff,device_.connOff,device_.layerOff,device_.src,device_.dst,device_.w, d_inputs_, d_outputs_, usePred ? d_predictions_: nullptr, batch.nIn, batch.nSamples, batch.nOut,totalThreads);
 
 	// ver si hay errores y sincronizar
 	gpuEvaluatorCheckCuda(cudaGetLastError());
@@ -197,8 +202,20 @@ void GpuEvaluator::evaluate(neat::Population& pop, const Task& task, const Batch
     {
         StageTimers::Scope s(*timers_,"d2h");
         for (int genomeId = 0; genomeId < (int)pop.genomes.size(); genomeId++){
-            float*out = d_outputs_ + (size_t)genomeId * (size_t)batch.nSamples * (size_t)batch.nOut;
-            pop.genomes[(size_t)genomeId].fitness = task.fitness(batch, out);
+            if (usePred){
+                const int32_t* pred = d_predictions_ + (size_t)genomeId * (size_t)batch.nSamples;
+                int correct = 0;
+                for (int s = 0; s<batch.nSamples; s++){
+                    if (pred[s] == batch.labels[(size_t)s]){
+                        correct++;
+                    }
+                }
+                float precision = (float)correct / (float)batch.nSamples;
+                pop.genomes[(size_t)genomeId].fitness = pow(precision, 4.0f);
+            } else {
+                float*out = d_outputs_ + (size_t)genomeId * (size_t)batch.nSamples * (size_t)batch.nOut;
+                pop.genomes[(size_t)genomeId].fitness = task.fitness(batch, out);
+            }
         }
     }
 }
