@@ -1,0 +1,60 @@
+===============================================================================
+Version:    v++ v2024.1 (64-bit)
+Build:      SW Build 5074859 on 2024-05-20-23:21:20
+Copyright:  Copyright 1986-2024 Xilinx, Inc. All Rights Reserved.
+Created:    Sat Nov 21 12:35:32 2026
+===============================================================================
+
+-------------------------------------------------------------------------------
+Design Name:             neat_eval_hls
+Target Device:           xilinx:kv260:kv260_hardware_Platform:0.0
+Target Clock:            199.998000MHz
+Total number of kernels: 1
+-------------------------------------------------------------------------------
+
+Kernel Summary
+Kernel Name    Type  Target              OpenCL Library  Compute Units
+-------------  ----  ------------------  --------------  -------------
+neat_eval_hls  c     fpga0:OCL_REGION_0  neat_eval_hls   1
+
+
+-------------------------------------------------------------------------------
+OpenCL Binary:     neat_eval_hls
+Kernels mapped to: clc_region
+
+Timing Information (MHz)
+Compute Unit     Kernel Name    Module Name                              Target Frequency  Estimated Frequency
+---------------  -------------  ---------------------------------------  ----------------  -------------------
+neat_eval_hls_1  neat_eval_hls  neat_eval_hls_Pipeline_CARGA_NODOS       200               273.972595
+neat_eval_hls_1  neat_eval_hls  neat_eval_hls_Pipeline_CARGA_CONEXIONES  200               273.972595
+neat_eval_hls_1  neat_eval_hls  neat_eval_hls_Pipeline_INIT              200               273.972595
+neat_eval_hls_1  neat_eval_hls  neat_eval_hls_Pipeline_CONEXIONES        200               289.519409
+neat_eval_hls_1  neat_eval_hls  neat_eval_hls_Pipeline_ACTIVACION        200               274.423706
+neat_eval_hls_1  neat_eval_hls  neat_eval_hls_Pipeline_VITIS_LOOP_148_5  200               273.972595
+neat_eval_hls_1  neat_eval_hls  neat_eval_hls_Pipeline_VITIS_LOOP_74_1   200               273.972595
+neat_eval_hls_1  neat_eval_hls  neat_eval_hls                            200               273.972595
+
+Latency Information
+Compute Unit     Kernel Name    Module Name                              Start Interval  Best (cycles)  Avg (cycles)  Worst (cycles)  Best (absolute)  Avg (absolute)  Worst (absolute)
+---------------  -------------  ---------------------------------------  --------------  -------------  ------------  --------------  ---------------  --------------  ----------------
+neat_eval_hls_1  neat_eval_hls  neat_eval_hls_Pipeline_CARGA_NODOS       0               undef          undef         undef           undef            undef           undef
+neat_eval_hls_1  neat_eval_hls  neat_eval_hls_Pipeline_CARGA_CONEXIONES  0               undef          undef         undef           undef            undef           undef
+neat_eval_hls_1  neat_eval_hls  neat_eval_hls_Pipeline_INIT              0               undef          undef         undef           undef            undef           undef
+neat_eval_hls_1  neat_eval_hls  neat_eval_hls_Pipeline_CONEXIONES        0               undef          undef         undef           undef            undef           undef
+neat_eval_hls_1  neat_eval_hls  neat_eval_hls_Pipeline_ACTIVACION        0               undef          undef         undef           undef            undef           undef
+neat_eval_hls_1  neat_eval_hls  neat_eval_hls_Pipeline_VITIS_LOOP_148_5  0               undef          undef         undef           undef            undef           undef
+neat_eval_hls_1  neat_eval_hls  neat_eval_hls_Pipeline_VITIS_LOOP_74_1   0               undef          undef         undef           undef            undef           undef
+neat_eval_hls_1  neat_eval_hls  neat_eval_hls                            undef           undef          undef         undef           undef            undef           undef
+
+Area Information
+Compute Unit     Kernel Name    Module Name                              FF     LUT    DSP  BRAM  URAM
+---------------  -------------  ---------------------------------------  -----  -----  ---  ----  ----
+neat_eval_hls_1  neat_eval_hls  neat_eval_hls_Pipeline_CARGA_NODOS       67     105    0    0     0
+neat_eval_hls_1  neat_eval_hls  neat_eval_hls_Pipeline_CARGA_CONEXIONES  109    160    0    0     0
+neat_eval_hls_1  neat_eval_hls  neat_eval_hls_Pipeline_INIT              136    217    0    0     0
+neat_eval_hls_1  neat_eval_hls  neat_eval_hls_Pipeline_CONEXIONES        398    394    0    0     0
+neat_eval_hls_1  neat_eval_hls  neat_eval_hls_Pipeline_ACTIVACION        828    1162   0    0     0
+neat_eval_hls_1  neat_eval_hls  neat_eval_hls_Pipeline_VITIS_LOOP_148_5  68     142    0    0     0
+neat_eval_hls_1  neat_eval_hls  neat_eval_hls_Pipeline_VITIS_LOOP_74_1   34     126    0    0     0
+neat_eval_hls_1  neat_eval_hls  neat_eval_hls                            11326  13937  0    55    0
+-------------------------------------------------------------------------------

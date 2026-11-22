@@ -29,6 +29,13 @@ cmake -H. -Bbuild -DNEUROEVO_WITH_CUDA=ON -DCMAKE_CUDA_FLAGS="-arch=sm_53"
 make -C build
 ```
 
+Con FPGA (Kria KV260, compilar en la propia Kria; contrato, XRT y emulación en [`docs/FPGA_INTERFAZ.md`](docs/FPGA_INTERFAZ.md)):
+
+```bash
+cmake -H. -Bbuild -DNEUROEVO_WITH_FPGA=ON && make -C build
+./build/neuroevo --task mnist --eval fpga --xclbin ./neat_eval.xclbin
+```
+
 Opciones: `--task`, `--eval`, `--gens`, `--pop`, `--train`, `--test`, `--seed`, `--csv`, `--data-dir`, `--threads`,
 `--no-fix-bias`, `--no-protect-elite`, `--template-params`, `--no-save`.
 `--no-fix-bias`, `--no-protect-elite` y `--template-params` reemplazan los ejecutables `MnistNEAT_sin_bias`, `_sin_elite` y `_template`.
