@@ -1,0 +1,11 @@
+       genomas dentro de tolerancia 8/8, diferencia maxima 0.0000 (tol 0.2500)
+       sub-etapas (s): pack 0.0000 h2d 0.0000 kernel 0.0010 d2h 0.0019
+ok:    XOR armado a mano en FPGA: fitness > 0.98
+ok:    XOR: toda la poblacion dentro de tolerancia
+Cargando MNIST desde /home/el5859/grupo2/esteb/ProyectoFinalHeterogeneos/neuroevo/../examples/mnist/mnist ...
+       nodos por genoma: minimo 207 (sin ocultos), maximo 212
+       genomas dentro de tolerancia 40/40, diferencia maxima 0.0000 (tol 0.0010)
+       sub-etapas (s): pack 0.0020 h2d 0.0006 kernel 0.3565 d2h 0.0026
+ok:    MNIST (ECM continuo): toda la poblacion dentro de tolerancia vs CPU
+
+todas pasan

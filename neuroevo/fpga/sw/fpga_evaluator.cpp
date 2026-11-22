@@ -20,7 +20,8 @@ using namespace neuroevo;
 using namespace neuroevo::fpga;
 
 namespace {
-
+// constante para revision de conexiones por genoma
+constexpr int KERNEL_MAX_CONNS = 6144;
 // ---------- Cuantizacion (host) ----------
 inline fx_t toFx(float x, int fracBits) {
     if constexpr (IS_FIXED) {
@@ -196,6 +197,12 @@ void FpgaEvaluator::evaluate(neat::Population& pop, const Task& task, const Batc
             throw std::runtime_error("FpgaEvaluator::evaluate: el genoma " + std::to_string(g) + " tiene " +
                                      std::to_string(n) + " nodos y el maximo es " +
                                      std::to_string(MAX_NODES_PER_GENOME) + " (fpga_abi.hpp)");
+	
+	int nc = packed.connOff[(size_t)g + 1] - packed.connOff[(size_t)g];
+        if (nc > KERNEL_MAX_CONNS)
+            throw std::runtime_error("FpgaEvaluator::evaluate: el genoma " + std::to_string(g) + " tiene " +
+                                     std::to_string(nc) + " conexiones y el maximo del kernel es " +
+                                     std::to_string(KERNEL_MAX_CONNS) + " (MAX_CONNS en neat_eval_hls.h)");
     }
 
     {
