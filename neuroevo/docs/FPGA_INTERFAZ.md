@@ -1,6 +1,4 @@
 # Evaluador FPGA (Kria KV260): contrato, compilación y ejecución
-
-Responsable del host: P3. Kernel HLS: P2. Punto fijo y LUT de sigmoide: P4.
 La fuente de verdad del contrato es [`include/neuroevo/fpga_abi.hpp`](../include/neuroevo/fpga_abi.hpp).
 
 ## Decisión de arquitectura
@@ -11,9 +9,12 @@ al enlace Jetson–Kria. Ambos aceleradores se comparan con el mismo programa, l
 parámetros (`--eval gpu` en la Jetson, `--eval fpga` en la Kria).
 
 ```
-Genome -> packPopulation (CSR) -> cuantizar a int16 -> xrt::bo (DDR compartida) -> kernel neat_eval -> int16 -> float -> Task::fitness
-          [pack]                  [h2d]                                           [kernel]             [d2h]
+Genome -> packPopulation (CSR) -> copiar a xrt::bo (DDR compartida, FP32) -> kernel neat_eval_hls -> salidas FP32 -> Task::fitness
+          [pack]                  [h2d]                                      [kernel]                [d2h]
 ```
+
+Con el kernel FP32 entregado no hay conversión de tipo en el host. Solo si se compila con `-DNEUROEVO_FPGA_FIXED=ON`
+`h2d` cuantiza pesos y entradas a `int16` y `d2h` los vuelve a `float` (ver [Punto fijo](#punto-fijo-no-implementado-en-el-kernel)).
 
 Mismas cuatro sub-etapas que la GPU (`t_pack`, `t_h2d`, `t_kernel`, `t_d2h` en el CSV), así la comparación es directa.
 
@@ -29,25 +30,31 @@ Mismas cuatro sub-etapas que la GPU (`t_pack`, `t_h2d`, `t_kernel`, `t_d2h` en e
 | 5 | `w` | `const float*` `[totalConns]` | pesos (FP32; `int16` Q8.8 solo con `-DNEUROEVO_FPGA_FIXED=ON`) |
 | 6 | `inputs` | `const float*` `[nSamples][nIn]` | entradas (FP32); se suben una sola vez |
 | 7 | `outputs` | `float*` `[pop][nSamples][nOut]` | salidas (FP32) |
-| 8 | `nGenomes` | `uint32` | genomas válidos en el lote |
-| 9 | `nSamples` | `uint32` | muestras |
-| 10 | `nIn` | `uint32` | entradas sin contar el bias |
-| 11 | `nOut` | `uint32` | salidas |
+| 8 | `nGenomes` | `int32` | genomas válidos en el lote |
+| 9 | `nSamples` | `int32` | muestras |
+| 10 | `nIn` | `int32` | entradas sin contar el bias |
+| 11 | `nOut` | `int32` | salidas |
+
+Los cuatro escalares son `int` en `neat_eval_hls.h`; el host los pasa como `unsigned` y siempre son no negativos.
 
 Semántica (idéntica a `evaluateKernel` en CUDA y a las reglas de `ARQUITECTURA.md`): ids locales `0`=bias (1.0),
 `1..nIn`=entradas, `nIn+1..nIn+nOut`=salidas, resto ocultos; para `l = 0 .. capaSalida-1` acumular conexiones con
 origen en la capa `l` y aplicar sigmoide a los nodos de la capa `l+1`; un nodo sin entradas vale `sigmoide(0)=0.5`.
 
-Límites: ≤ 500 nodos por genoma; conexiones reservadas = 3 × 1970 × `popSize`. Ambos se validan en `evaluate()`
-con mensaje explícito.
+### Límites
 
-### Decisiones abiertas con P2 y P4 (cambiar solo `fpga_abi.hpp`)
+| Límite | Valor | Dónde se define | Qué pasa si se supera |
+|---|---|---|---|
+| Nodos por genoma (host) | 500 | `MAX_NODES_PER_GENOME` en `fpga_abi.hpp` | `evaluate()` aborta con mensaje explícito |
+| Conexiones reservadas | 3 × 1970 × `popSize` | `AVG_CONNS_PER_GENOME`, `CONNS_MARGIN` en `fpga_abi.hpp` | `evaluate()` aborta con mensaje explícito |
+| Conexiones por genoma (kernel) | 6144 | `MAX_CONNS` en `fpga/hw/neat_eval_hls.h` (`KERNEL_MAX_CONNS` en el host) | `evaluate()` aborta con mensaje explícito |
+| Nodos por genoma (kernel) | 512 | `MAX_NODES` en `fpga/hw/neat_eval_hls.h` | el host ya corta en 500; si llegara al kernel, este escribiría ceros para ese genoma |
 
-1. **Formato de punto fijo (solo si se usa `NEUROEVO_FPGA_FIXED`).** Se dejó Q8.8 para pesos y Q4.12 para entradas/salidas. Los pesos de NEAT pueden crecer
-   más allá de ±8 (el XOR de prueba usa ±30), por eso no se usó Q4.12 en pesos. P4 debe confirmar el formato y el ancho del acumulador.
-2. **Bancos de memoria.** El host usa `kernel.group_id(i)` de cada argumento; el `.cfg` de v++ (`sp=...`) debe asignar bancos válidos.
-3. **Empaquetado de conexiones.** `src`/`dst` viajan como `int32` por compatibilidad con `PackedBatch`. Si P2 los quiere
-   fusionados en una palabra de 32 bits (`int16|int16`) para reducir ancho de banda, es un cambio local en `h2d` y en el ABI.
+### Decisiones de diseño (cambiar solo `fpga_abi.hpp`)
+
+1. **Bancos de memoria.** El host usa `kernel.group_id(i)` de cada argumento, así que respeta los bancos con que se enlazó el `.xclbin`.
+2. **Empaquetado de conexiones.** `src`/`dst` viajan como `int32` por compatibilidad con `PackedBatch`. Fusionarlos en una palabra
+   de 32 bits (`int16|int16`) reduciría el ancho de banda; sería un cambio local en `h2d`, en el ABI y en el kernel.
 
 ## Binarios disponibles (`binaries/`)
 
@@ -58,16 +65,18 @@ Cinco variantes con la misma interfaz (nombre de kernel, 12 argumentos, una inst
 
 ```bash
 sudo mkdir -p /lib/firmware/xilinx/neat_eval_hls
-sudo cp binaries/v2_lanes4/{neat_eval_hls.bit.bin,neat_eval_hls.dtbo,shell.json} /lib/firmware/xilinx/neat_eval_hls/
+sudo cp binaries/v2_lanes8/{neat_eval_hls.bit.bin,neat_eval_hls.dtbo,shell.json} /lib/firmware/xilinx/neat_eval_hls/
 sudo xmutil unloadapp && sudo xmutil loadapp neat_eval_hls
-./build/neuroevo --task mnist --eval fpga --xclbin binaries/v2_lanes4/neat_eval_hls.xclbin ...
+./build/neuroevo --task mnist --eval fpga --xclbin binaries/v2_lanes8/neat_eval_hls.xclbin ...
 ```
 
-(Flujo estándar de apps en la KV260; sin probar en la placa. Si se cambia de variante, repetir `unloadapp`/`loadapp`
-con los archivos de esa variante, y que el `.xclbin` sea el de la misma carpeta.)
+Este flujo está automatizado en [`fpga/sw/bench_lanes8.sh`](../fpga/sw/bench_lanes8.sh) y se probó en la placa con `v2_lanes8`
+(resultados en [`results/fpga_f3/`](../results/fpga_f3/README.md)). Las demás variantes comparten interfaz, pero en el repo no hay
+resultados en placa de ellas. Si se cambia de variante, repetir `unloadapp`/`loadapp` con los archivos de esa variante, y que el
+`.xclbin` sea el de la misma carpeta. En una placa compartida, `bench_lanes8.sh` no descarga la app activa de otro grupo salvo que se use `FORCE=1`.
 
 **Tipo de dato:** `fpga/hw/neat_eval_hls.h` define `typedef float data_t;`, así que el host trabaja en FP32 por defecto.
-Los punteros salen como `void*` en el `.xclbin`; si P4 pasa el kernel a punto fijo, compilar con `-DNEUROEVO_FPGA_FIXED=ON` y alinear `fpga_abi.hpp`.
+Los punteros salen como `void*` en el `.xclbin`.
 
 ## Compilar
 
@@ -82,14 +91,14 @@ cmake -H. -Bbuild -DNEUROEVO_WITH_FPGA=ON
 make -C build -j4
 ```
 
-Sin placa (cualquier PC, valida host/empaquetado/cuantización con un modelo en software del kernel):
+Sin placa (cualquier PC, valida host y empaquetado con un modelo en software del kernel):
 
 ```bash
 cmake -H. -Bbuild -DNEUROEVO_FPGA_EMU=ON && make -C build -j4
 ```
 
-Nota: `project()` ahora declara solo `CXX`; CUDA se habilita únicamente con `-DNEUROEVO_WITH_CUDA=ON`. Antes,
-CMake exigía `nvcc` aun para la compilación CPU, lo que impedía compilar en la Kria.
+Nota: `project()` declara solo `CXX`; CUDA se habilita únicamente con `-DNEUROEVO_WITH_CUDA=ON`, así que la compilación
+CPU/FPGA no exige `nvcc` y se puede compilar en la Kria. El registro de evaluadores que compila el CMake es `fpga/sw/registry.cpp`.
 
 ## Ejecutar y validar
 
@@ -101,14 +110,29 @@ CMake exigía `nvcc` aun para la compilación CPU, lo que impedía compilar en l
 
 `--xclbin` equivale a la variable `NEUROEVO_XCLBIN`; el dispositivo XRT se elige con `NEUROEVO_FPGA_DEVICE` (por defecto 0).
 Si el `.xclbin` no carga, `init()` termina con un mensaje que nombra el archivo y el kernel esperado.
-Criterio de aceptación provisional (a confirmar con P4): `|fitness_fpga − fitness_cpu| ≤ 1/nSamples` en ≥ 99 % de los genomas.
 
-Estado de validación: la ruta de emulación pasa las pruebas (XOR armado a mano y 40 genomas de MNIST con ocultos).
-**La ruta XRT con hardware real no se ha podido probar aquí**; se compila contra la API nativa C++ de XRT
-(`xrt::device/kernel/bo`) y necesita el `.xclbin` de P2 y una prueba en la placa.
+**Criterio de aceptación** (`tests/test_fpga.cpp`): toda la población debe quedar dentro de tolerancia respecto a `CpuEvaluator`
+(100 % de los genomas, no un porcentaje parcial).
+
+| Prueba | Tolerancia de fitness (FP32) | Tolerancia con `NEUROEVO_FPGA_FIXED` |
+|---|---|---|
+| XOR armado a mano (pesos hasta ±30) | `1/nSamples` (0.25) | `1/nSamples` (0.25) |
+| MNIST, 40 genomas con ocultos, fitness continuo `1/(1+ECM)` | `1e-3` | `0.02` |
+
+Estado de validación: pasa en emulación y en la Kria con `v2_lanes8`, con kernel FP32: XOR 8/8 y MNIST 40/40 (207 a 212 nodos),
+diferencia máxima 0.0000 (ver `results/fpga_f3/v2_lanes8/validacion.txt`). Como ambos lados usan FP32 coinciden exactamente,
+así que esta prueba no mide error de punto fijo ni de LUT, y ningún genoma probado se acerca a los límites de nodos o conexiones.
+
+## Punto fijo (no implementado en el kernel)
+
+El host puede cuantizar con `-DNEUROEVO_FPGA_FIXED=ON` (`fx_t = int16_t`: pesos Q8.8, entradas y salidas Q4.12), pero el kernel entregado es FP32.
+Para usarlo habría que cambiar `data_t` en `neat_eval_hls.h`, regenerar el `.xclbin` y mantener alineado `fpga_abi.hpp`.
+Los pesos de NEAT pueden crecer más allá de ±8 (el XOR de prueba usa ±30), por eso los pesos usan Q8.8 y no Q4.12; el ancho del acumulador sigue sin definirse.
 
 ## Pendiente
 
-- Probar la ruta XRT en la Kria con el `.xclbin` real y ajustar los bancos de memoria.
-- Evaluar buffers `host_only`/cacheables para evitar `sync` en la DDR compartida, y lanzar más de una `run` por generación si P2 reparte la población en varias CU.
+- Punto fijo en el kernel y LUT para la sigmoide; medir su error contra FP32.
+- Validar con genomas cercanos a los límites de nodos y conexiones del kernel (y registrar el máximo observado en las corridas).
+- Evaluar buffers `host_only`/cacheables para evitar `sync` en la DDR compartida, y lanzar más de una `run` por generación si se reparte la población en varias CU.
 - `forward()` (exactitud en prueba, cada 10 generaciones) sigue en CPU en coma flotante, igual que en GPU; para reportar la exactitud del modelo en punto fijo habría que enviarlo también al kernel.
+- Comparar el tiempo contra CPU y GPU, y optimizar el kernel (el cuello de botella es `t_kernel`, ~99.6 % de la evaluación).

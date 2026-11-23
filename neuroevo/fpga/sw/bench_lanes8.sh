@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # F3: validacion FPGA vs CPU + perfilado del kernel v2_lanes8 en la Kria.
 # Uso:
-#   ./fpga/sw/f3_lanes8.sh                  # 5 corridas x 100 generaciones
-#   QUICK=1 ./fpga/sw/f3_lanes8.sh          # prueba rapida: 1 corrida x 5 gens
-#   RUNS=3 GENS=50 ./fpga/sw/f3_lanes8.sh
+#   ./fpga/sw/bench_lanes8.sh               # 5 corridas x 100 generaciones
+#   QUICK=1 ./fpga/sw/bench_lanes8.sh       # prueba rapida: 1 corrida x 5 gens
+#   RUNS=3 GENS=50 ./fpga/sw/bench_lanes8.sh
 # Conviene correrlo dentro de tmux. Es reanudable: si un CSV existe, se salta.
 set -uo pipefail
 
