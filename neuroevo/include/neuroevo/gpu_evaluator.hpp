@@ -29,12 +29,14 @@ private:
     int popSize_ = 0;
     int maxTotalNodes_ = 0;
     int maxTotalConns_ = 0;
+    int inputSamples_ = 0;
     
     DeviceBatch device_;
     
     float* d_inputs_ = nullptr;
     float*d_outputs_ = nullptr;
-
+    int32_t* d_predictions_ = nullptr;
+    
     
 };
 }

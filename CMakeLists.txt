@@ -10,6 +10,11 @@ file(GLOB SOURCES src/*.cpp)
 
 add_library(neat STATIC ${SOURCES})
 
+# agregar openMP
+
+find_package(OpenMP REQUIRED)
+target_link_libraries(neat PUBLIC OpenMP::OpenMP_CXX)
+
 target_include_directories(neat PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )

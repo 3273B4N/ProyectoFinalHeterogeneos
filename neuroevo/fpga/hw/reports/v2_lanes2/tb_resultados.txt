@@ -1,0 +1,17 @@
+XOR armado a mano            genomas=1   imagenes=4    conexiones=9      error max=5.757e-08  OK
+XOR, tabla de verdad         salidas = 0.0000 1.0000 1.0000 0.0000  OK
+redes aleatorias pequenas    genomas=8   imagenes=13   conexiones=110    error max=5.785e-08  OK
+tamano MNIST (196 -> 10)     genomas=3   imagenes=37   conexiones=5914   error max=4.391e-07  OK
+RESULTADO: OK
+XOR armado a mano            genomas=1   imagenes=4    conexiones=9      error max=5.757e-08  OK
+XOR, tabla de verdad         salidas = 0.0000 1.0000 1.0000 0.0000  OK
+redes aleatorias pequenas    genomas=8   imagenes=13   conexiones=110    error max=5.785e-08  OK
+tamano MNIST (196 -> 10)     genomas=3   imagenes=37   conexiones=5914   error max=4.391e-07  OK
+RESULTADO: OK
+Pass Through NonSizing Optimizer
+XOR armado a mano            genomas=1   imagenes=4    conexiones=9      error max=5.757e-08  OK
+XOR, tabla de verdad         salidas = 0.0000 1.0000 1.0000 0.0000  OK
+redes aleatorias pequenas    genomas=8   imagenes=13   conexiones=110    error max=5.785e-08  OK
+tamano MNIST (196 -> 10)     genomas=3   imagenes=37   conexiones=5914   error max=4.391e-07  OK
+RESULTADO: OK
+INFO: [COSIM 212-1000] *** C/RTL co-simulation finished: PASS ***

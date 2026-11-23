@@ -59,6 +59,7 @@ static void usage(const char* prog) {
          << "  --no-fix-bias          ablacion: no corregir el bias\n"
          << "  --no-protect-elite     ablacion: mutate() tambien muta al elite\n"
          << "  --template-params      parametros originales del template de NEAT\n"
+         << "  --xclbin ruta          bitstream .xclbin del evaluador fpga (o NEUROEVO_XCLBIN)\n"
          << "  --no-save              no guardar la poblacion final\n";
 }
 
@@ -84,6 +85,7 @@ static bool parseArgs(int argc, char** argv, Options& o) {
         else if (a == "--no-fix-bias") o.fixBias = false;
         else if (a == "--no-protect-elite") o.protectElite = false;
         else if (a == "--template-params") o.templateParams = true;
+        else if (a == "--xclbin") { if (!next(v)) return false; setenv("NEUROEVO_XCLBIN", v.c_str(), 1); }
         else if (a == "--no-save") o.save = false;
         else if (a == "--help" || a == "-h") { usage(argv[0]); exit(0); }
         else { cerr << "Opcion desconocida: " << a << "\n"; return false; }
@@ -140,7 +142,12 @@ int main(int argc, char* argv[]) {
     const char* base[] = {"evaluar", "especiar", "cruzar", "mutar"};
     for (const char* s : base) timers.declare(s);
     timers.declare("test");   // evaluacion en prueba: no va al CSV, solo al resumen
-    evaluator->init(*task, popSize, timers);
+    try {
+        evaluator->init(*task, popSize, timers);
+    } catch (const exception& e) {
+        cerr << e.what() << endl;
+        return 1;
+    }
     vector<string> extras = evaluator->extraStages();
     for (const string& s : extras) timers.declare(s);
 

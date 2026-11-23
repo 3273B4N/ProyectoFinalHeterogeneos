@@ -4,7 +4,7 @@ Separa qué se resuelve (`Task`) de dónde se evalúa (`Evaluator`),
 para que MNIST, XOR y futuros problemas corran igual en CPU, GPU y FPGA.
 
 ```
-neuroevo --task <mnist|xor> --eval <cpu|gpu> [opciones]
+neuroevo --task <mnist|xor> --eval <cpu|gpu|fpga> [opciones]
 ```
 
 Arquitectura y diagramas: [`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md). Formato del lote y validación: sección "Decisiones de diseño" del [README principal](../README.md).
@@ -29,13 +29,22 @@ cmake -H. -Bbuild -DNEUROEVO_WITH_CUDA=ON -DCMAKE_CUDA_FLAGS="-arch=sm_53"
 make -C build
 ```
 
+Con FPGA (Kria KV260, compilar en la propia Kria; contrato, XRT y emulación en [`docs/FPGA_INTERFAZ.md`](docs/FPGA_INTERFAZ.md)):
+
+```bash
+cmake -H. -Bbuild -DNEUROEVO_WITH_FPGA=ON && make -C build
+./build/neuroevo --task mnist --eval fpga --xclbin ./neat_eval.xclbin
+```
+
+Para validar y perfilar la variante `v2_lanes8` en la placa: `./fpga/sw/bench_lanes8.sh` (resultados en [`results/fpga_f3/`](results/fpga_f3/README.md)).
+
 Opciones: `--task`, `--eval`, `--gens`, `--pop`, `--train`, `--test`, `--seed`, `--csv`, `--data-dir`, `--threads`,
-`--no-fix-bias`, `--no-protect-elite`, `--template-params`, `--no-save`.
+`--no-fix-bias`, `--no-protect-elite`, `--template-params`, `--xclbin` (solo `--eval fpga`; equivale a `NEUROEVO_XCLBIN`), `--no-save`.
 `--no-fix-bias`, `--no-protect-elite` y `--template-params` reemplazan los ejecutables `MnistNEAT_sin_bias`, `_sin_elite` y `_template`.
 
 ## Salidas
 
-- `<tarea>_neat_log.csv`: una fila por generación. Columnas: `generacion,precision_train,precision_test,t_evaluar,t_especiar,t_cruzar,t_mutar,conexiones_prom` (las mismas de antes) y, si el evaluador declara sub-etapas, `t_<sub-etapa>` al final (con GPU: `t_pack`, `t_h2d`, `t_kernel`, `t_d2h`).
+- `<tarea>_neat_log.csv`: una fila por generación. Columnas: `generacion,precision_train,precision_test,t_evaluar,t_especiar,t_cruzar,t_mutar,conexiones_prom` (las mismas de antes) y, si el evaluador declara sub-etapas, `t_<sub-etapa>` al final (con GPU o FPGA: `t_pack`, `t_h2d`, `t_kernel`, `t_d2h`).
 - `<tarea>_neat_backup.txt`: población final (`--no-save` lo omite).
 - Resumen por consola con el porcentaje de tiempo de cada etapa.
 
@@ -45,6 +54,7 @@ Opciones: `--task`, `--eval`, `--gens`, `--pop`, `--train`, `--test`, `--seed`, 
 cd ../examples/mnist && ./unix_launch.sh && cd ../../neuroevo     # compila el MNIST original (referencia)
 ./tests/regression.sh                                 # misma semilla => mismas columnas deterministas
 ./build/neuroevo_tests                                # interfaces Task/Evaluator + XOR armado a mano
+./build/neuroevo_fpga_tests                           # FPGA vs CPU (solo si se compiló con FPGA o emulación)
 ```
 
 La regresión fuerza `OMP_NUM_THREADS=1`: con varios hilos, `Population::crossover` agrega los hijos dentro de un
@@ -85,7 +95,7 @@ Una tarea es un problema con muestras y una forma de puntuar la red. No toca CPU
    }  // namespace neuroevo
    ```
 
-2. Declarar `makeMiTarea` en `include/neuroevo/registry.hpp` y agregar la rama en `src/registry.cpp` (`makeTask` y `taskNames`).
+2. Declarar `makeMiTarea` en `include/neuroevo/registry.hpp` y agregar la rama en `fpga/sw/registry.cpp` (`makeTask` y `taskNames`). Ese es el archivo que compila el CMake; `src/registry.cpp` ya no se usa.
 3. Agregar `tasks/mi_tarea.cpp` a `add_executable` (y a `neuroevo_tests`) en `CMakeLists.txt`.
 4. Ejecutar `./build/neuroevo --task mi_tarea`.
 
@@ -99,5 +109,5 @@ Reglas de la tarea:
 ## Cómo agregar un evaluador (GPU / FPGA)
 
 1. Heredar de `neuroevo::Evaluator` (`include/neuroevo/evaluator.hpp`): implementar `evaluate()`; `init()` para subir el lote una vez; `extraStages()` para declarar sub-tiempos (`h2d`, `kernel`, `d2h`) y medirlos con `StageTimers::Scope` o `timers.add(...)`.
-2. Registrarlo en `src/registry.cpp` (hay un bloque comentado como plantilla) detrás de un `#ifdef NEUROEVO_WITH_CUDA` / `NEUROEVO_WITH_FPGA`.
+2. Registrarlo en `fpga/sw/registry.cpp` (`makeEvaluator` y `evaluatorNames`), con su `#include` y su rama detrás de un `#ifdef NEUROEVO_WITH_CUDA` / `NEUROEVO_WITH_FPGA`, igual que `gpu` y `fpga`.
 3. Validarlo contra `CpuEvaluator` (ver la sección "Decisiones de diseño" del README principal) y correr `tests/regression.sh` para confirmar que el CPU sigue idéntico.

@@ -205,3 +205,58 @@ Total de muestras por corrida: 473115, 472328, 473212, 474303, 473598.
 | kernel + copias | 75.783 | 0.055 |
 
 Con los perfilados de GPU una de las cosas que se pueden destacar es que la mayoría del tiempo la consume el kernel (el cómputo en sí) y no los movimientos de memoria, por lo que si en un futuro se quisiera optimizar este programa, el enfoque estaría en el kernel en sí. Un punto de mejora que se puede empezar a explorar es aproximar la función de activación (sigmoide) para ver si se puede lograr una mejora. También se observa que el nuevo cuello de botella está en el cruce de los genomas y en la comparación, por lo que queda para trabajo futuro la exploración de en cuál plataforma conviene más correr este proceso.
+
+# Optimizaciones del acelerador 1 (GPU)
+
+Configuración: tarea mnist, 100 generaciones, 1000 imágenes, 150 individuos en la población, 42 semillas, 5 ejecuciones, Jetson Nano. Resultados sin procesar en `results/gpu_opt1_transpuesta/`, `results/gpu_opt2/` y `results/gpu_opt3/`.
+
+## Optimización 1: entradas transpuestas
+
+En esta optimización las entradas de entrenamiento cambiaron de `[muestra][característica]` a `[característica][muestra]`.
+- `init()` hace una copia transpuesta de `d_inputs_` (una única vez).
+- En lugar de `inputs[m*nIn + s-1]`, el kernel lee `inputs[(s-1)*nSamples + m]`.
+- `evaluate()` comprueba que la cantidad de muestras en el batch coincida con la de `init()`.
+
+Este cambio se realizó por los hilos sucesivos de un warp trabajan con muestras sucesivas. En el diseño previo, sus lecturas estaban separadas por 196 floats; en el nuevo diseño, en cambio, acceden a posiciones contiguas de memoria, es decir, a accesos coalescidos.
+
+### Resultados
+| Etapa | v1 | Con transposición |
+|---|---|---|
+| kernel (nvprof) | 75.78 ± 0.06 s | 47.81 ± 0.67 s |
+| kernel (timers del programa) | 75.95 s | ~48.9 s |
+| pack | 0.64 s | 0.68 s |
+| h2d | 0.42 s | 0.42 s |
+| d2h | 1.21 s | ~2.53 s |
+| evaluar (suma de sub-etapas) | ~78.2 s | ~52.5 s |
+
+
+## Optimización 2: copia en bloque en h2d
+
+En esta optimizació se sustituye la invocación de `memcpy` por arreglo por los seis ciclos que copiaban de manera individual los arreglos de `PackedBatch` (`connOff`, `nodeOff`, `layer`, `src`, `dst`, `w`) a la memoria unificada en la fase `h2d.
+
+Este cambio se realizó para disminuir el overhead de copia en la unidad central de procesamiento (CPU). La transferencia real a través de PCIe no existe con memoria unificada, por lo que `h2d` mide el costo de escribir en la memoria compartida de la CPU y la GPU.
+
+### Resultados
+| Etapa | Opt 1 (transposición) | Opt 2 (memcpy) |
+|---|---|---|
+| pack | 0.68 s | 0.67 s |
+| h2d | 0.42 s | 0.34 s (0.33-0.35) |
+| kernel (timers) | ~48.9 s | ~48.7 s (46.20-50.68) |
+| d2h | ~2.53 s | ~2.58 s |
+
+## Optimización 3: predicción en el device 
+
+En lugar de diez números flotantes por muestra, el kernel ahora escribe un solo entero por muestra (la predicción: el índice de la salida máxima, el primer máximo, como en `MnistTask::argmax`) en `d_prediction_`. En `d2h`, la CPU realiza el conteo de aciertos en comparación con `batch.labels` y determina `exactitud^4`.
+- Solo se aplica a la clasificación (cuando `batch.labels` no está vacío). XOR mantiene la ruta de floats.
+- El kernel obtiene un parámetro adicional (`pred`); en el caso de que este sea `nullptr`, imprime los floats de la misma manera que antes.
+Reducir los datos que la CPU lee y recorre después del kernel (de ~6 MB a ~0.6 MB por generación).
+
+
+### Resultados
+| Etapa | Opt 2 (memcpy) | Opt 3 (predicción en device) |
+|---|---|---|
+| pack | 0.67 s | 0.66 s (0.63-0.68) |
+| h2d | 0.34 s | 0.34 s (0.33-0.34) |
+| kernel (timers) | ~48.7 s | ~47.81 s (46.87-48.90) |
+| d2h | ~2.58 s | **~0.63 s** (0.61-0.65) |
+| evaluar (suma) | ~52.3 s | ~49.4 s |

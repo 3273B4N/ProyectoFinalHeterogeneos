@@ -1,0 +1,73 @@
+Cargando MNIST desde /home/el5859/grupo2/esteb/ProyectoFinalHeterogeneos/neuroevo/../examples/mnist/mnist ...
+Tarea mnist | evaluador fpga | poblacion 150 | 1000 muestras de entrenamiento | 1000 de prueba | 100 generaciones | semilla 46 | hilos OpenMP 4
+Ajustes: FIX_BIAS=1 PROTECT_ELITE=1 TEMPLATE_PARAMS=0
+
+gen    0 | train  19.6% | test  19.8% | evaluar 4.10s especiar 5.42s cruzar 5.47s mutar 0.002s
+gen   10 | train  38.7% | test  30.7% | evaluar 4.33s especiar 5.41s cruzar 5.49s mutar 0.003s
+gen   20 | train  45.3% | test  37.7% | evaluar 4.31s especiar 5.44s cruzar 5.49s mutar 0.004s
+gen   30 | train  49.8% | test  40.4% | evaluar 4.61s especiar 5.41s cruzar 5.48s mutar 0.004s
+gen   40 | train  52.0% | test  42.1% | evaluar 4.61s especiar 5.41s cruzar 5.48s mutar 0.003s
+gen   50 | train  53.6% | test  44.3% | evaluar 4.99s especiar 5.48s cruzar 5.49s mutar 0.003s
+gen   60 | train  56.0% | test  47.2% | evaluar 4.73s especiar 5.44s cruzar 5.49s mutar 0.002s
+gen   70 | train  56.2% | test  46.1% | evaluar 5.82s especiar 5.44s cruzar 5.50s mutar 0.003s
+gen   80 | train  57.3% | test  46.9% | evaluar 6.19s especiar 5.42s cruzar 5.49s mutar 0.003s
+gen   90 | train  58.9% | test  49.5% | evaluar 6.75s especiar 5.46s cruzar 5.50s mutar 0.004s
+gen   99 | train  58.9% | test  49.5% | evaluar 6.91s especiar 5.45s cruzar 5.50s mutar 0.002s
+
+Tiempo total 1613.1s: evaluar 32% | especiar 34% | cruzar 34% | mutar 0%
+(+ 0.50s evaluando en prueba, fuera de las etapas anteriores)
+  sub-etapa pack       0.78s (incluida en evaluar)
+  sub-etapa h2d        0.18s (incluida en evaluar)
+  sub-etapa kernel     517.41s (incluida en evaluar)
+  sub-etapa d2h        1.46s (incluida en evaluar)
+
+Ejemplos con el mejor individuo:
+                                
+                                
+                                
+          ::--..                
+          ****%%%%%%%%%%++      
+                ......++++      
+                    ..@@..      
+                    **==        
+                  ..%%..        
+                  ##==          
+                ==##            
+              ..@@..            
+              **@@..            
+              --::              
+    real: 7   NEAT dice: 7
+
+                                
+              ::====..          
+            ++@@%%%%++          
+          ..@@::  ++**          
+                ..%%++          
+                **%%..          
+              ==@@::            
+            ..%%++              
+            ++%%..              
+            @@++        ..----  
+            %%@@@@@@##%%@@%%##::
+            ..::--====::        
+                                
+                                
+    real: 2   NEAT dice: 6
+
+                                
+                                
+                    **::        
+                    ##          
+                  --++          
+                  **==          
+                ..##..          
+                --##            
+                **--            
+                %%::            
+              ::@@..            
+              ==++              
+                                
+                                
+    real: 1   NEAT dice: 1
+
+Registro por generacion en results/fpga_f3/v2_lanes8/mnist_100gen_pop150_seed46_run5.csv.tmp

@@ -1,0 +1,14 @@
+
+ Performance counter stats for './build/neuroevo --task mnist --eval gpu --gens 100 --train 1000 --pop 150 --seed 42' (5 runs):
+
+     456290,177246      task-clock (msec)         #    1,178 CPUs utilized            ( +-  0,04% )
+             7 481      context-switches          #    0,016 K/sec                    ( +-  2,04% )
+               171      cpu-migrations            #    0,000 K/sec                    ( +-  4,28% )
+           253 987      page-faults               #    0,557 K/sec                    ( +-  0,05% )
+   420 971 184 845      cycles                    #    0,923 GHz                      ( +-  0,06% )
+ 1 147 206 484 230      instructions              #    2,73  insn per cycle           ( +-  0,03% )
+   <not supported>      branches                                                    
+       186 988 433      branch-misses                                                 ( +-  0,93% )
+
+     387,274623278 seconds time elapsed                                          ( +-  0,21% )
+
