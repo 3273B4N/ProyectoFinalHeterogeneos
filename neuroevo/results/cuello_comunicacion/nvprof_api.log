@@ -1,0 +1,17 @@
+==22891== NVPROF is profiling process 22891, command: ./build/neuroevo --task mnist --eval gpu --gens 100 --train 1000 --pop 150 --seed 42 --no-save
+==22891== Warning: Unified Memory Profiling is not supported on the underlying platform. System requirements for unified memory can be found at: http://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#um-requirements
+==22891== Profiling application: ./build/neuroevo --task mnist --eval gpu --gens 100 --train 1000 --pop 150 --seed 42 --no-save
+==22891== Profiling result:
+            Type  Time(%)      Time     Calls       Avg       Min       Max  Name
+ GPU activities:  100.00%  46.6241s       100  466.24ms  355.95ms  621.77ms  evaluateKernel(int const *, int const *, int const *, int const *, int const *, float const *, float const *, float*, int*, int, int, int, int)
+      API calls:   96.90%  46.8107s       100  468.11ms  357.62ms  622.93ms  cudaDeviceSynchronize
+                    1.82%  881.15ms       100  8.8115ms  6.2453ms  9.1676ms  cudaLaunchKernel
+                    1.25%  604.44ms         9  67.160ms  112.66us  589.02ms  cudaMallocManaged
+                    0.02%  11.023ms         9  1.2248ms  186.67us  7.4479ms  cudaFree
+                    0.00%  211.21us       100  2.1120us  1.7190us  2.9160us  cudaGetLastError
+                    0.00%  175.16us        97  1.8050us  1.0930us  31.928us  cuDeviceGetAttribute
+                    0.00%  11.823us         1  11.823us  11.823us  11.823us  cuDeviceTotalMem
+                    0.00%  8.5400us         3  2.8460us  1.6660us  3.9580us  cuDeviceGetCount
+                    0.00%  4.5320us         2  2.2660us  1.9270us  2.6050us  cuDeviceGet
+                    0.00%  2.1880us         1  2.1880us  2.1880us  2.1880us  cuDeviceGetName
+                    0.00%  1.3540us         1  1.3540us  1.3540us  1.3540us  cuDeviceGetUuid
