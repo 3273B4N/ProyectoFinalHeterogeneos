@@ -1,0 +1,69 @@
+Cargando MNIST desde /home/jenni/Documents/Heterogenea/PROYECTO/ProyectoFinalHeterogeneos/neuroevo/../examples/mnist/mnist ...
+Tarea mnist | evaluador cpu | poblacion 150 | 1000 muestras de entrenamiento | 1000 de prueba | 100 generaciones | semilla 42 | hilos OpenMP 4
+Ajustes: FIX_BIAS=1 PROTECT_ELITE=1 TEMPLATE_PARAMS=0
+
+gen    0 | train  18.9% | test  12.8% | evaluar 0.06s especiar 0.12s cruzar 0.07s mutar 0.000s
+gen   10 | train  38.6% | test  33.3% | evaluar 0.09s especiar 0.13s cruzar 0.07s mutar 0.000s
+gen   20 | train  51.7% | test  45.3% | evaluar 0.09s especiar 0.12s cruzar 0.07s mutar 0.000s
+gen   30 | train  57.5% | test  48.3% | evaluar 0.10s especiar 0.12s cruzar 0.07s mutar 0.000s
+gen   40 | train  59.1% | test  45.9% | evaluar 0.10s especiar 0.12s cruzar 0.07s mutar 0.001s
+gen   50 | train  63.3% | test  51.4% | evaluar 0.10s especiar 0.12s cruzar 0.07s mutar 0.000s
+gen   60 | train  65.0% | test  56.2% | evaluar 0.10s especiar 0.12s cruzar 0.07s mutar 0.000s
+gen   70 | train  68.2% | test  56.0% | evaluar 0.10s especiar 0.13s cruzar 0.07s mutar 0.000s
+gen   80 | train  68.7% | test  56.6% | evaluar 0.10s especiar 0.13s cruzar 0.07s mutar 0.000s
+gen   90 | train  70.2% | test  59.7% | evaluar 0.10s especiar 0.12s cruzar 0.07s mutar 0.000s
+gen   99 | train  71.0% | test  59.3% | evaluar 0.10s especiar 0.12s cruzar 0.07s mutar 0.000s
+
+Tiempo total 28.7s: evaluar 32% | especiar 43% | cruzar 24% | mutar 0%
+(+ 0.02s evaluando en prueba, fuera de las etapas anteriores)
+
+Ejemplos con el mejor individuo:
+                                
+                                
+                                
+          ::--..                
+          ****%%%%%%%%%%++      
+                ......++++      
+                    ..@@..      
+                    **==        
+                  ..%%..        
+                  ##==          
+                ==##            
+              ..@@..            
+              **@@..            
+              --::              
+    real: 7   NEAT dice: 7
+
+                                
+              ::====..          
+            ++@@%%%%++          
+          ..@@::  ++**          
+                ..%%++          
+                **%%..          
+              ==@@::            
+            ..%%++              
+            ++%%..              
+            @@++        ..----  
+            %%@@@@@@##%%@@%%##::
+            ..::--====::        
+                                
+                                
+    real: 2   NEAT dice: 3
+
+                                
+                                
+                    **::        
+                    ##          
+                  --++          
+                  **==          
+                ..##..          
+                --##            
+                **--            
+                %%::            
+              ::@@..            
+              ==++              
+                                
+                                
+    real: 1   NEAT dice: 1
+
+Registro por generacion en mnist_neat_log.csv
